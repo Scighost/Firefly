@@ -13,12 +13,16 @@ public record ModelSettingObj
         }
         public record Motion
         {
+            public string Name { get; set; }
             public string File { get; set; }
+            public int WrapMode { get; set; }
             public string Sound { get; set; }
-            [DefaultValue(-1f)]
-            public float FadeInTime { get; set; }
-            [DefaultValue(-1f)]
-            public float FadeOutTime { get; set; }
+            public int SoundDelay { get; set; }
+            public string Expression { get; set; }
+            public int Priority { get; set; }
+            public string NextMtn { get; set; }
+            public float FadeInTime { get; set; } = -1;
+            public float FadeOutTime { get; set; } = -1;
         }
         public string Moc { get; set; }
         public List<string> Textures { get; set; }
@@ -34,6 +38,8 @@ public record ModelSettingObj
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        /// <summary>格式: "GroupName:MotionName"</summary>
+        public string Motion { get; set; }
     }
 
     public record Parameter

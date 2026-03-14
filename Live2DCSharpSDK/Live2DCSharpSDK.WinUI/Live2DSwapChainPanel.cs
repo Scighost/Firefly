@@ -2,7 +2,9 @@
 using Live2DCSharpSDK.WinUI.LApp;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Diagnostics;
+using Windows.Foundation;
 
 namespace Live2DCSharpSDK.WinUI;
 
@@ -90,21 +92,35 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
 
 
+    private bool _pointerPressed;
 
-    bool _pointerPressed;
+    private bool _pointerMoved;
+
+    private Point _lastPointPosition;
 
 
     private void Live2DSwapChainPanel_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         this.CapturePointer(e.Pointer);
         _pointerPressed = true;
+        _pointerMoved = false;
+        _lastPointPosition = e.GetCurrentPoint(this).Position;
     }
 
 
     private void Live2DSwapChainPanel_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         this.ReleasePointerCapture(e.Pointer);
+        _lApp.Live2dManager.OnDrag(0, 0);
+        if (!_pointerMoved)
+        {
+            Point p = e.GetCurrentPoint(this).Position;
+            double x = p.X * 2 / this.ActualWidth - 1;
+            double y = 1 - p.Y * 2 / this.ActualHeight;
+            _lApp.Live2dManager.OnTap((float)x, (float)y);
+        }
         _pointerPressed = false;
+        _pointerMoved = false;
     }
 
 
@@ -112,10 +128,17 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
     {
         if (_pointerPressed && _modelLoaded)
         {
-            var p = e.GetCurrentPoint(this).Position;
-            double x = p.X * 2 / this.ActualWidth - 1;
-            double y = 1 - p.Y * 2 / this.ActualHeight;
-            _lApp.Live2dManager.OnDrag((float)x, (float)y);
+            Point p = e.GetCurrentPoint(this).Position;
+            if (!_pointerMoved && Math.Abs(p.X - _lastPointPosition.X) + Math.Abs(p.Y - _lastPointPosition.Y) > 6)
+            {
+                _pointerMoved = true;
+            }
+            else if (_pointerMoved)
+            {
+                double x = p.X * 2 / this.ActualWidth - 1;
+                double y = 1 - p.Y * 2 / this.ActualHeight;
+                _lApp.Live2dManager.OnDrag((float)x, (float)y);
+            }
         }
     }
 

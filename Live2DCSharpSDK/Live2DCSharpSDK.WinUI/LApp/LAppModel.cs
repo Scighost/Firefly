@@ -37,26 +37,34 @@ public class LAppModel : CubismUserModel
     /// </summary>
     public readonly Dictionary<string, ACubismMotion> _expressions = [];
 
-    public List<string> Motions => new(_motions.Keys);
-    public List<string> Expressions => new(_expressions.Keys);
-    public List<(string, int, float)> Parts
+    /// <summary>
+    /// グループごとに独立したモーションマネージャー
+    /// </summary>
+    private readonly Dictionary<string, CubismMotionManager> _groupMotionManagers = [];
+    /// <summary>
+    /// グループごとの表情マネージャー（SaveParameters後に適用、motionファイルなしの純表情グループ用）
+    /// </summary>
+    private readonly Dictionary<string, CubismMotionManager> _groupExpressionManagers = [];
+    /// <summary>
+    /// グループごとの現在再生中モーションのJSONプライオリティ（抢占判断に使用）
+    /// </summary>
+    private readonly Dictionary<string, int> _groupCurrentPriority = [];
+
+    public IReadOnlyCollection<string> Motions => _motions.Keys;
+    public IReadOnlyCollection<string> Expressions => _expressions.Keys;
+    public IEnumerable<(string Id, int Index, float Opacity)> Parts
     {
         get
         {
-            var list = new List<(string, int, float)>();
-            var count = Model.GetPartCount();
+            int count = Model.GetPartCount();
             for (int a = 0; a < count; a++)
-            {
-                list.Add((Model.GetPartId(a),
-                    a, Model.GetPartOpacity(a)));
-            }
-            return list;
+                yield return (Model.GetPartId(a), a, Model.GetPartOpacity(a));
         }
     }
 
     public List<TextureInfo> Textures = [];
 
-    public List<string> Parameters => new(Model.ParameterIds);
+    public IEnumerable<string> Parameters => Model.ParameterIds;
 
     /// <summary>
     /// デルタ時間の積算値[秒]
@@ -97,9 +105,9 @@ public class LAppModel : CubismUserModel
         .GetId(CubismDefaultParameterId.ParamBreath);
 
     /// <summary>
-    /// wavファイルハンドラ
+    /// wavファイルハンドラ（音声再生とリップシンクRMS計算）
     /// </summary>
-    //LAppWavFileHandler _wavFileHandler;
+    private readonly LAppWavFileHandler _wavFileHandler = new();
 
     private readonly LAppDelegate _lapp;
 
@@ -116,18 +124,12 @@ public class LAppModel : CubismUserModel
             _mocConsistency = true;
         }
 
-        IdParamAngleX = CubismFramework.CubismIdManager
-            .GetId(CubismDefaultParameterId.ParamAngleX);
-        IdParamAngleY = CubismFramework.CubismIdManager
-            .GetId(CubismDefaultParameterId.ParamAngleY);
-        IdParamAngleZ = CubismFramework.CubismIdManager.
-            GetId(CubismDefaultParameterId.ParamAngleZ);
-        IdParamBodyAngleX = CubismFramework.CubismIdManager
-            .GetId(CubismDefaultParameterId.ParamBodyAngleX);
-        IdParamEyeBallX = CubismFramework.CubismIdManager
-            .GetId(CubismDefaultParameterId.ParamEyeBallX);
-        IdParamEyeBallY = CubismFramework.CubismIdManager
-            .GetId(CubismDefaultParameterId.ParamEyeBallY);
+        IdParamAngleX = CubismFramework.CubismIdManager.GetId(CubismDefaultParameterId.ParamAngleX);
+        IdParamAngleY = CubismFramework.CubismIdManager.GetId(CubismDefaultParameterId.ParamAngleY);
+        IdParamAngleZ = CubismFramework.CubismIdManager.GetId(CubismDefaultParameterId.ParamAngleZ);
+        IdParamBodyAngleX = CubismFramework.CubismIdManager.GetId(CubismDefaultParameterId.ParamBodyAngleX);
+        IdParamEyeBallX = CubismFramework.CubismIdManager.GetId(CubismDefaultParameterId.ParamEyeBallX);
+        IdParamEyeBallY = CubismFramework.CubismIdManager.GetId(CubismDefaultParameterId.ParamEyeBallY);
 
         _modelHomeDir = dir;
 
@@ -170,16 +172,7 @@ public class LAppModel : CubismUserModel
                     continue;
                 }
 
-                var motion = new CubismExpressionMotion(path);
-
-                if (_expressions.ContainsKey(name))
-                {
-                    _expressions[name] = motion;
-                }
-                else
-                {
-                    _expressions.Add(name, motion);
-                }
+                _expressions[name] = new CubismExpressionMotion(path);
             }
         }
 
@@ -259,6 +252,17 @@ public class LAppModel : CubismUserModel
 
         _motionManager.StopAllMotions();
 
+        // グループ専用のモーションマネージャーを初期化
+        if (_modelSetting.FileReferences?.Motions != null)
+        {
+            foreach (var group in _modelSetting.FileReferences.Motions.Keys)
+            {
+                _groupMotionManagers[group] = new CubismMotionManager();
+                _groupExpressionManagers[group] = new CubismMotionManager();
+                _groupCurrentPriority[group] = 0;
+            }
+        }
+
         Updating = false;
         Initialized = true;
         if (Renderer != null)
@@ -274,16 +278,9 @@ public class LAppModel : CubismUserModel
     {
         base.Dispose();
 
+        _wavFileHandler.Dispose();
         _motions.Clear();
         _expressions.Clear();
-
-        if (_modelSetting.FileReferences?.Motions?.Count > 0)
-        {
-            foreach (var item in _modelSetting.FileReferences.Motions)
-            {
-                ReleaseMotionGroup(item.Key);
-            }
-        }
 
         foreach (var item in Textures)
         {
@@ -372,15 +369,27 @@ public class LAppModel : CubismUserModel
 
         //-----------------------------------------------------------------
         Model.LoadParameters(); // 前回セーブされた状態をロード
-        if (_motionManager.IsFinished() && RandomMotion)
+
+        // 各グループのモーションマネージャーを独立して更新
+        foreach (var (group, mgr) in _groupMotionManagers)
         {
-            // モーションの再生がない場合、待機モーションの中からランダムで再生する
-            StartRandomMotion(LAppDefine.MotionGroupIdle, MotionPriority.PriorityIdle);
+            motionUpdated |= mgr.UpdateMotion(Model, deltaTimeSeconds);
+            if (mgr.IsFinished())
+                _groupCurrentPriority[group] = 0;
         }
-        else
+
+        // アイドルグループが終了していたらランダム再生
+        if (RandomMotion)
         {
-            motionUpdated = _motionManager.UpdateMotion(Model, deltaTimeSeconds); // モーションを更新
+            string idleGroup = LAppDefine.MotionGroupIdle;
+            bool idleFinished = !_groupMotionManagers.TryGetValue(idleGroup, out var idleMgr)
+                || idleMgr.IsFinished();
+            if (idleFinished)
+            {
+                StartRandomMotion(idleGroup, MotionPriority.PriorityIdle);
+            }
         }
+
         Model.SaveParameters(); // 状態を保存
 
         //-----------------------------------------------------------------
@@ -396,6 +405,11 @@ public class LAppModel : CubismUserModel
         }
 
         _expressionManager?.UpdateMotion(Model, deltaTimeSeconds); // 表情でパラメータ更新（相対変化）
+        // 純表情グループはSaveParameters後に適用（motionファイルが上書きしないよう）
+        foreach (var (_, mgr) in _groupExpressionManagers)
+        {
+            mgr.UpdateMotion(Model, deltaTimeSeconds);
+        }
 
         if (CustomValueUpdate)
         {
@@ -426,12 +440,8 @@ public class LAppModel : CubismUserModel
         // リップシンクの設定
         if (_lipSync)
         {
-            // リアルタイムでリップシンクを行う場合、システムから音量を取得して0〜1の範囲で値を入力します。
-            float value = 0.0f;
-
-            // 状態更新/RMS値取得
-            //_wavFileHandler.Update(deltaTimeSeconds);
-            //value = _wavFileHandler.GetRms();
+            _wavFileHandler.Update(deltaTimeSeconds);
+            float value = _wavFileHandler.GetRms();
 
             for (int i = 0; i < _lipSyncIds.Count; ++i)
             {
@@ -483,64 +493,131 @@ public class LAppModel : CubismUserModel
         return StartMotion(temp[0], int.Parse(temp[1]), priority, onFinishedMotionHandler);
     }
 
-    public CubismMotionQueueEntry? StartMotion(string group, int no, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    /// <summary>
+    /// "GroupName:MotionName" 形式の参照でモーションを開始する。NextMtnが存在する場合は連鎖して再生する。
+    /// </summary>
+    public CubismMotionQueueEntry? StartMotionByRef(string motionRef, MotionPriority priority)
     {
-        if (priority == MotionPriority.PriorityForce)
+        var parts = motionRef.Split(':', 2);
+        if (parts.Length != 2) return null;
+
+        string group = parts[0];
+        string motionName = parts[1];
+
+        var motions = _modelSetting.FileReferences?.Motions;
+        if (motions == null || !motions.TryGetValue(group, out var list)) return null;
+
+        int index = list.FindIndex(m => m.Name == motionName);
+        if (index < 0) return null;
+
+        string? nextMtn = list[index].NextMtn;
+        FinishedMotionCallback? callback = null;
+        if (!string.IsNullOrEmpty(nextMtn))
         {
-            _motionManager.ReservePriority = priority;
+            callback = (_, _) => StartMotionByRef(nextMtn, MotionPriority.PriorityForce);
         }
-        else if (!_motionManager.ReserveMotion(priority))
+
+        // 没有 File 时是纯表情触发动作，走该组专属表情 manager（SaveParameters后适用）
+        if (string.IsNullOrEmpty(list[index].File))
         {
-            CubismLog.Debug("[Live2D App]can't start motion.");
+            string? expr = list[index].Expression;
+            if (!string.IsNullOrEmpty(expr) && _expressions.TryGetValue(expr, out var exprMotion))
+            {
+                if (_groupExpressionManagers.TryGetValue(group, out var grpMgr))
+                {
+                    grpMgr.StartMotionPriority(exprMotion, MotionPriority.PriorityForce);
+                }
+                else
+                    SetExpression(expr);
+            }
+            callback?.Invoke(null!, null!);
             return null;
         }
 
+        return StartMotion(group, index, priority, callback);
+    }
+
+    public CubismMotionQueueEntry? StartMotion(string group, int no, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    {
         var item = _modelSetting.FileReferences.Motions[group][no];
 
         //ex) idle_0
         string name = $"{group}_{no}";
 
-        CubismMotion motion;
-        if (!_motions.TryGetValue(name, out var value))
+        // File が空の場合は表情のみ切り替え、グループ専属表情 manager で独立再生（SaveParameters後適用）
+        if (string.IsNullOrEmpty(item.File))
         {
-            string path = item.File;
-            path = Path.GetFullPath(_modelHomeDir + path);
-            if (!File.Exists(path))
+            if (!string.IsNullOrEmpty(item.Expression) && _expressions.TryGetValue(item.Expression, out var exprMotion))
             {
+                if (_groupExpressionManagers.TryGetValue(group, out var grpMgr))
+                {
+                    grpMgr.StartMotionPriority(exprMotion, MotionPriority.PriorityForce);
+                }
+                else
+                    SetExpression(item.Expression);
+            }
+            onFinishedMotionHandler?.Invoke(null!, null!);
+            return null;
+        }
+
+        // グループ専用マネージャーを取得または作成
+        if (!_groupMotionManagers.TryGetValue(group, out var groupManager))
+        {
+            groupManager = new CubismMotionManager();
+            _groupMotionManagers[group] = groupManager;
+        }
+
+        // 同グループで再生中のモーションがある場合、JSONプライオリティで抢占を判断する
+        if (!groupManager.IsFinished())
+        {
+            int curPriority = _groupCurrentPriority.GetValueOrDefault(group);
+            if (item.Priority <= curPriority)
+            {
+                CubismLog.Debug($"[Live2D App]can't start motion: priority {item.Priority} <= current {curPriority}.");
                 return null;
             }
+        }
 
-            motion = new CubismMotion(path, onFinishedMotionHandler);
+        if (priority == MotionPriority.PriorityForce)
+        {
+            groupManager.ReservePriority = priority;
+        }
+        else if (!groupManager.ReserveMotion(priority))
+        {
+            CubismLog.Debug("[Live2D App]can't start motion.");
+            return null;
+        }
+
+        if (!_motions.TryGetValue(name, out var value))
+        {
+            string path = Path.GetFullPath(_modelHomeDir + item.File);
+            if (!File.Exists(path))
+                return null;
+
+            var newMotion = new CubismMotion(path);
             float fadeTime = item.FadeInTime;
             if (fadeTime >= 0.0f)
-            {
-                motion.FadeInSeconds = fadeTime;
-            }
-
+                newMotion.FadeInSeconds = fadeTime;
             fadeTime = item.FadeOutTime;
             if (fadeTime >= 0.0f)
-            {
-                motion.FadeOutSeconds = fadeTime;
-            }
-            motion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
+                newMotion.FadeOutSeconds = fadeTime;
+            newMotion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
+            _motions[name] = value = newMotion;
         }
-        else
-        {
-            motion = (value as CubismMotion)!;
-            motion.OnFinishedMotion = onFinishedMotionHandler;
-        }
+        var motion = (CubismMotion)value!;
+        motion.OnFinishedMotion = onFinishedMotionHandler;
 
         //voice
         string voice = item.Sound;
         if (!string.IsNullOrWhiteSpace(voice))
         {
-            //string path = voice;
-            //path = _modelHomeDir + path;
-            //_wavFileHandler.Start(path);
+            string soundPath = Path.GetFullPath(_modelHomeDir + voice);
+            _wavFileHandler.Start(soundPath, item.SoundDelay);
         }
 
-        CubismLog.Debug($"[Live2D App]start motion: [{group}_{no}]");
-        return _motionManager.StartMotionPriority(motion, priority);
+        _groupCurrentPriority[group] = item.Priority;
+        CubismLog.Debug($"[Live2D App]start motion: [{group}_{no}] priority={item.Priority}");
+        return groupManager.StartMotionPriority(motion, priority);
     }
 
     /// <summary>
@@ -552,11 +629,9 @@ public class LAppModel : CubismUserModel
     /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
     public object? StartRandomMotion(string group, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
     {
-        if (_modelSetting.FileReferences?.Motions?.ContainsKey(group) == true)
-        {
-            int no = _random.Next() % _modelSetting.FileReferences.Motions[group].Count;
-            return StartMotion(group, no, priority, onFinishedMotionHandler);
-        }
+        var motionGroups = _modelSetting.FileReferences?.Motions;
+        if (motionGroups != null && motionGroups.TryGetValue(group, out var groupList) && groupList.Count > 0)
+            return StartMotion(group, _random.Next(groupList.Count), priority, onFinishedMotionHandler);
 
         return null;
     }
@@ -567,17 +642,13 @@ public class LAppModel : CubismUserModel
     /// <param name="expressionID">表情モーションのID</param>
     public void SetExpression(string expressionID)
     {
-        ACubismMotion motion = _expressions[expressionID];
-        CubismLog.Debug($"[Live2D App]expression: [{expressionID}]");
-
-        if (motion != null)
-        {
-            _expressionManager.StartMotionPriority(motion, MotionPriority.PriorityForce);
-        }
-        else
+        if (!_expressions.TryGetValue(expressionID, out var motion))
         {
             CubismLog.Debug($"[Live2D App]expression[{expressionID}] is null ");
+            return;
         }
+        CubismLog.Debug($"[Live2D App]expression: [{expressionID}]");
+        _expressionManager.StartMotionPriority(motion, MotionPriority.PriorityForce);
     }
 
     /// <summary>
@@ -590,16 +661,14 @@ public class LAppModel : CubismUserModel
             return;
         }
 
-        int no = _random.Next() % _expressions.Count;
-        int i = 0;
-        foreach (var item in _expressions)
+        int target = _random.Next(_expressions.Count);
+        foreach (var key in _expressions.Keys)
         {
-            if (i == no)
+            if (target-- == 0)
             {
-                SetExpression(item.Key);
+                SetExpression(key);
                 return;
             }
-            i++;
         }
     }
 
@@ -630,7 +699,7 @@ public class LAppModel : CubismUserModel
         }
         if (_modelSetting.HitAreas?.Count > 0)
         {
-            for (int i = 0; i < _modelSetting.HitAreas?.Count; i++)
+            for (int i = 0; i < _modelSetting.HitAreas.Count; i++)
             {
                 if (_modelSetting.HitAreas[i].Name == hitAreaName)
                 {
@@ -654,21 +723,6 @@ public class LAppModel : CubismUserModel
         }
 
         Renderer?.DrawModel();
-    }
-
-    /// <summary>
-    /// モーションデータをグループ名から一括で解放する。
-    /// モーションデータの名前は内部でModelSettingから取得する。
-    /// </summary>
-    /// <param name="group">モーションデータのグループ名</param>
-    private void ReleaseMotionGroup(string group)
-    {
-        var list = _modelSetting.FileReferences.Motions[group];
-        for (int i = 0; i < list.Count; i++)
-        {
-            string voice = list[i].Sound;
-            //TODO Voice
-        }
     }
 
     /// <summary>
@@ -703,41 +757,24 @@ public class LAppModel : CubismUserModel
         for (int i = 0; i < list.Count; i++)
         {
             var item = list[i];
+            if (string.IsNullOrEmpty(item.File))
+                continue;
             //ex) idle_0
-            // モーションのファイル名とパスの取得
             string name = $"{group}_{i}";
             var path = Path.GetFullPath(_modelHomeDir + item.File);
             if (!File.Exists(path))
-            {
                 continue;
-            }
 
-            // モーションデータの読み込み
             var tmpMotion = new CubismMotion(path);
 
-            // フェードインの時間を取得
             float fadeTime = item.FadeInTime;
             if (fadeTime >= 0.0f)
-            {
                 tmpMotion.FadeInSeconds = fadeTime;
-            }
-
-            // フェードアウトの時間を取得
             fadeTime = item.FadeOutTime;
             if (fadeTime >= 0.0f)
-            {
                 tmpMotion.FadeOutSeconds = fadeTime;
-            }
             tmpMotion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
-
-            if (_motions.ContainsKey(name))
-            {
-                _motions[name] = tmpMotion;
-            }
-            else
-            {
-                _motions.Add(name, tmpMotion);
-            }
+            _motions[name] = tmpMotion;
         }
     }
 }

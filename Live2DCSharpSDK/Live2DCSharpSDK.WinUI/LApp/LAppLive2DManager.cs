@@ -76,17 +76,41 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     {
         CubismLog.Debug($"[Live2D App]tap point: x:{x:0.00} y:{y:0.00}");
 
+        int width = lapp.WindowWidth;
+        int height = lapp.WindowHeight;
+
         for (int i = 0; i < _models.Count; i++)
         {
-            if (_models[i].HitTest(LAppDefine.HitAreaNameHead, x, y))
+            var model = _models[i];
+            var hitAreas = model._modelSetting.HitAreas;
+            if (hitAreas != null)
             {
-                CubismLog.Debug($"[Live2D App]hit area: [{LAppDefine.HitAreaNameHead}]");
-                _models[i].SetRandomExpression();
-            }
-            else if (_models[i].HitTest(LAppDefine.HitAreaNameBody, x, y))
-            {
-                CubismLog.Debug($"[Live2D App]hit area: [{LAppDefine.HitAreaNameBody}]");
-                _models[i].StartRandomMotion(LAppDefine.MotionGroupTapBody, MotionPriority.PriorityNormal, OnFinishedMotion);
+                // OnDraw 中叠加了投影缩放，命中测试需要施加其逆变换
+                float canvasW = model.Model.GetCanvasWidth();
+                float canvasH = model.Model.GetCanvasHeight();
+                float tx, ty;
+                if (canvasW * height > canvasH * width)
+                {
+                    // OnDraw: Scale(1.0, width/height) → 逆: y *= height/width
+                    tx = x;
+                    ty = y * height / width;
+                }
+                else
+                {
+                    // OnDraw: Scale(height/width, 1.0) → 逆: x *= width/height
+                    tx = x * width / height;
+                    ty = y;
+                }
+
+                foreach (var area in hitAreas)
+                {
+                    if (!string.IsNullOrEmpty(area.Motion) && model.HitTest(area.Name, tx, ty))
+                    {
+                        CubismLog.Debug($"[Live2D App]hit area: [{area.Name}] motion: [{area.Motion}]");
+                        model.StartMotionByRef(area.Motion, MotionPriority.PriorityForce);
+                        break;
+                    }
+                }
             }
         }
     }

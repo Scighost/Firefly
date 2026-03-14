@@ -107,7 +107,11 @@ public partial class D3D11SwapChainPanel : SwapChainPanel
             HResult hr = _d3d11Api.CreateDevice(null,
                                                D3DDriverType.Hardware,
                                                0,
+#if DEBUG
                                                (uint)(CreateDeviceFlag.BgraSupport | CreateDeviceFlag.Debug),
+#else
+                                               (uint)CreateDeviceFlag.BgraSupport,
+#endif
                                                ref level,
                                                1,
                                                SilkD3D11.D3D11.SdkVersion,
@@ -164,7 +168,7 @@ public partial class D3D11SwapChainPanel : SwapChainPanel
 
     public unsafe void Present()
     {
-        HResult hr = _swapChain.Present(1, 0);
+        HResult hr = _swapChain.Present(0, 0);
 
         if (hr == unchecked((int)0x887A0005) || hr == unchecked((int)0x887A0007))
         {
