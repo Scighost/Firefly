@@ -23,6 +23,7 @@ public record ModelSettingObj
             public string NextMtn { get; set; }
             public float FadeInTime { get; set; } = -1;
             public float FadeOutTime { get; set; } = -1;
+            public bool Interruptable { get; set; }
         }
         public string Moc { get; set; }
         public List<string> Textures { get; set; }
