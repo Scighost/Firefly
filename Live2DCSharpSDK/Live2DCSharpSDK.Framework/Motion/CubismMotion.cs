@@ -293,7 +293,10 @@ public class CubismMotion : ACubismMotion
             EventCount = obj.Meta.UserDataCount,
             Curves = new CubismMotionCurve[obj.Meta.CurveCount],
             Segments = new CubismMotionSegment[obj.Meta.TotalSegmentCount],
-            Points = new CubismMotionPoint[obj.Meta.TotalPointCount],
+            // TotalPointCount in the JSON metadata may be unreliable across editor versions
+            // (e.g. it may not count Bezier control points). Use a guaranteed safe upper bound:
+            // 1 start point per curve + up to 3 points per segment (worst case: all Bezier).
+            Points = new CubismMotionPoint[obj.Meta.CurveCount + 3 * obj.Meta.TotalSegmentCount],
             Events = new CubismMotionEvent[obj.Meta.UserDataCount]
         };
 
