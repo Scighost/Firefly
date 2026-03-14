@@ -1,6 +1,8 @@
-﻿using SkiaSharp;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Windows.Graphics.Imaging;
 
 namespace Live2DCSharpSDK.WinUI.LApp;
 
@@ -26,16 +28,21 @@ public class LAppTextureManager(LAppDelegate lapp)
             lapp.RebindTexture(model, index, item);
             return item;
         }
-        var info1 = SKBitmap.DecodeBounds(fileName);
-        info1.ColorType = SKColorType.Rgba8888;
-        using var image = SKBitmap.Decode(fileName, info1);
 
-        // OpenGL用のテクスチャを生成する
-        var info = lapp.CreateTexture(model, index, image.Width, image.Height, image.GetPixels());
+        using var fs = File.OpenRead(fileName);
+        var decoder = BitmapDecoder.CreateAsync(fs.AsRandomAccessStream()).GetAwaiter().GetResult();
+        var pidelDataProvider = decoder.GetPixelDataAsync(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Straight, new BitmapTransform(), ExifOrientationMode.IgnoreExifOrientation, ColorManagementMode.DoNotColorManage).GetAwaiter().GetResult();
+        byte[] pixelData = pidelDataProvider.DetachPixelData();
+
+        TextureInfo info;
+        fixed (byte* p = pixelData)
+        {
+            info = lapp.CreateTexture(model, index, (int)decoder.PixelWidth, (int)decoder.PixelHeight, (nint)p);
+        }
         info.FileName = fileName;
-        info.Width = image.Width;
+        info.Width = (int)decoder.PixelWidth;
         info.Index = index;
-        info.Height = image.Height;
+        info.Height = (int)decoder.PixelHeight;
 
         _textures.Add(info);
 
