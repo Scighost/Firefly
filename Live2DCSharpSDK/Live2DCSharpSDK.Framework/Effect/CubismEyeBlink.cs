@@ -47,8 +47,6 @@ public class CubismEyeBlink
     /// </summary>
     private float _userTimeSeconds;
 
-    private readonly Random _random = new();
-
     /// <summary>
     /// インスタンスを作成する。
     /// </summary>
@@ -184,7 +182,7 @@ public class CubismEyeBlink
     /// <returns>次のまばたきを行う時刻[秒]</returns>
     private float DetermineNextBlinkingTiming()
     {
-        float r = _random.Next() / int.MaxValue;
+        float r = Random.Shared.NextSingle();
 
         return _userTimeSeconds + (r * (2.0f * _blinkingIntervalSeconds - 1.0f));
     }
