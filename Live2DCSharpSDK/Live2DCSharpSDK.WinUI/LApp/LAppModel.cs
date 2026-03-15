@@ -1,11 +1,14 @@
-﻿using Live2DCSharpSDK.Framework;
+﻿using ABI.Windows.AI.MachineLearning;
+using Live2DCSharpSDK.Framework;
 using Live2DCSharpSDK.Framework.Effect;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace Live2DCSharpSDK.WinUI.LApp;
@@ -46,13 +49,17 @@ public class LAppModel : CubismUserModel
     /// </summary>
     private readonly Dictionary<string, CubismMotionManager> _groupExpressionManagers = [];
     /// <summary>
-    /// 各组当前播放动作的 JSON 优先级（用于抓占判断）
+    /// 各组当前播放动作的优先级
     /// </summary>
-    private readonly Dictionary<string, int> _groupCurrentPriority = [];
+    private readonly Dictionary<string, MotionPriority> _groupCurrentPriority = [];
     /// <summary>
     /// 各组当前播放动作是否可被打断
     /// </summary>
     private readonly Dictionary<string, bool> _groupCurrentInterruptable = [];
+    /// <summary>
+    /// 运行时状态变量表（VarFloats），用于控制动作播放条件与赋值
+    /// </summary>
+    private readonly Dictionary<string, float> _varFloats = [];
 
     public IReadOnlyCollection<string> Motions => _motions.Keys;
     public IReadOnlyCollection<string> Expressions => _expressions.Keys;
@@ -75,7 +82,6 @@ public class LAppModel : CubismUserModel
     /// </summary>
     public float UserTimeSeconds { get; set; }
 
-    public bool RandomMotion { get; set; } = true;
     public bool CustomValueUpdate { get; set; }
 
     public Action<LAppModel>? ValueUpdate;
@@ -263,9 +269,16 @@ public class LAppModel : CubismUserModel
             {
                 _groupMotionManagers[group] = new CubismMotionManager();
                 _groupExpressionManagers[group] = new CubismMotionManager();
-                _groupCurrentPriority[group] = 0;
+                _groupCurrentPriority[group] = MotionPriority.PriorityNone;
                 _groupCurrentInterruptable[group] = false;
             }
+        }
+
+        // 执行 Start 组 VarFloat 赋值，初始化运行时状态变量
+        if (_modelSetting.FileReferences?.Motions?.TryGetValue("Start", out var startMotions) == true)
+        {
+            foreach (var startItem in startMotions)
+                ExecuteVarFloatAssignments(startItem);
         }
 
         Updating = false;
@@ -383,19 +396,7 @@ public class LAppModel : CubismUserModel
             {
                 // 仅重置优先级；_groupCurrentInterruptable 由 StartMotion 内的显式路径
                 // （非可打断动作触发时）负责清零，避免纯表情组每帧误清标志
-                _groupCurrentPriority[group] = 0;
-            }
-        }
-
-        // 空闲组结束时随机播放
-        if (RandomMotion)
-        {
-            string idleGroup = LAppDefine.MotionGroupIdle;
-            bool idleFinished = !_groupMotionManagers.TryGetValue(idleGroup, out var idleMgr)
-                || idleMgr.IsFinished();
-            if (idleFinished)
-            {
-                StartRandomMotion(idleGroup, MotionPriority.PriorityIdle);
+                _groupCurrentPriority[group] = MotionPriority.PriorityNone;
             }
         }
 
@@ -487,12 +488,11 @@ public class LAppModel : CubismUserModel
     /// <summary>
     /// 开始播放指定名称的动作。
     /// </summary>
-    /// <param name="group">动作组名称</param>
-    /// <param name="no">组内编号</param>
-    /// <param name="priority">优先级</param>
+    /// <param name="name">动作名，格式为 "Group_Index"</param>
+    /// <param name="priority">优先级；PriorityNone 表示使用 JSON 定义的优先级</param>
     /// <param name="onFinishedMotionHandler">动作播放结束时调用的回调函数。为 NULL 时不调用。</param>
     /// <returns>返回已启动动作的标识号。无法启动时返回 "-1"。</returns>
-    public CubismMotionQueueEntry? StartMotion(string name, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    public CubismMotionQueueEntry? StartMotion(string name, MotionPriority priority = MotionPriority.PriorityNone, FinishedMotionCallback? onFinishedMotionHandler = null)
     {
         var temp = name.Split("_");
         if (temp.Length != 2)
@@ -503,9 +503,11 @@ public class LAppModel : CubismUserModel
     }
 
     /// <summary>
-    /// 以 "GroupName:MotionName" 格式的引用开始播放动作。存在 NextMtn 时串联播放。
+    /// 以 "GroupName:MotionName" 格式的引用开始播放动作。
+    /// NextMtn 链式处理及 VarFloat 检查均由 StartMotion(group, no, ...) 负责。
     /// </summary>
-    public CubismMotionQueueEntry? StartMotionByRef(string motionRef, MotionPriority priority)
+    /// <param name="priority">优先级；PriorityNone 表示使用 JSON 定义的优先级</param>
+    public CubismMotionQueueEntry? StartMotionByRef(string motionRef, MotionPriority priority = MotionPriority.PriorityNone)
     {
         var parts = motionRef.Split(':', 2);
         if (parts.Length != 2) return null;
@@ -519,58 +521,38 @@ public class LAppModel : CubismUserModel
         int index = list.FindIndex(m => m.Name == motionName);
         if (index < 0) return null;
 
-        string? nextMtn = list[index].NextMtn;
-        FinishedMotionCallback? callback = null;
-        if (!string.IsNullOrEmpty(nextMtn))
-        {
-            callback = (_, _) => StartMotionByRef(nextMtn, MotionPriority.PriorityForce);
-        }
+        return StartMotion(group, index, priority);
+    }
 
-        // 没有 File 时是纯表情触发动作，走该组专属表情 manager（SaveParameters后适用）
-        if (string.IsNullOrEmpty(list[index].File))
+    public CubismMotionQueueEntry? StartMotion(string group, int no, MotionPriority priority = MotionPriority.PriorityNone, FinishedMotionCallback? onFinishedMotionHandler = null)
+    {
+        var motionsDef = _modelSetting.FileReferences?.Motions;
+        if (motionsDef == null || !motionsDef.TryGetValue(group, out var groupDef)) return null;
+        if (no < 0 || no >= groupDef.Count) return null;
+
+        var item = groupDef[no];
+        string name = $"{group}_{no}";
+
+        // 计算有效优先级：PriorityNone 表示使用 JSON 定义的优先级，直接将 int 强转，允许超出枚举范围
+        var effectivePriority = priority != MotionPriority.PriorityNone ? priority : (MotionPriority)item.Priority;
+
+        // 1. 检查 VarFloats 条件（Type=1）：条件不满足时拒绝启动
+        if (!CheckVarFloatConditions(item))
         {
-            if (list[index].Interruptable)
-            {
-                // 已有可打断表情在播，不重复触发
-                if (_groupCurrentInterruptable.GetValueOrDefault(group))
-                    return null;
-            }
-            else
-            {
-                // 非可打断表情（如回正）重置标志
-                _groupCurrentInterruptable[group] = false;
-            }
-            string? expr = list[index].Expression;
-            if (!string.IsNullOrEmpty(expr) && _expressions.TryGetValue(expr, out var exprMotion))
-            {
-                if (_groupExpressionManagers.TryGetValue(group, out var grpMgr))
-                {
-                    // Interruptable 表情立即清空旧队列，不留残影
-                    if (list[index].Interruptable)
-                    {
-                        grpMgr.StopAllMotions();
-                        _groupCurrentInterruptable[group] = true;
-                    }
-                    grpMgr.StartMotionPriority(exprMotion, MotionPriority.PriorityForce);
-                }
-                else
-                    SetExpression(expr);
-            }
-            callback?.Invoke(null!, null!);
+            CubismLog.Debug($"[Live2D App]can't start motion [{name}]: VarFloat condition not met.");
             return null;
         }
 
-        return StartMotion(group, index, priority, callback);
-    }
+        // 2. 组合 NextMtn 回调（仅在动作自然结束时触发，被打断则不触发）
+        FinishedMotionCallback? chainCallback = onFinishedMotionHandler;
+        if (!string.IsNullOrEmpty(item.NextMtn))
+        {
+            string nextRef = item.NextMtn;
+            var prev = chainCallback;
+            chainCallback = (m, a) => { StartMotionByRef(nextRef); prev?.Invoke(m, a); };
+        }
 
-    public CubismMotionQueueEntry? StartMotion(string group, int no, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
-    {
-        var item = _modelSetting.FileReferences.Motions[group][no];
-
-        //ex) idle_0
-        string name = $"{group}_{no}";
-
-        // 当 File 为空时仅切换表情，由组专属表情 manager 独立播放（在 SaveParameters 后应用）
+        // 3. 处理无 File 动作（纯表情型 / 控制型）
         if (string.IsNullOrEmpty(item.File))
         {
             if (item.Interruptable)
@@ -581,56 +563,64 @@ public class LAppModel : CubismUserModel
             }
             else
             {
+                // 非可打断动作（如回正）重置组的可打断标志
                 _groupCurrentInterruptable[group] = false;
             }
+
+            // 执行 VarFloat 赋值
+            ExecuteVarFloatAssignments(item);
+
+            // 应用表情
             if (!string.IsNullOrEmpty(item.Expression) && _expressions.TryGetValue(item.Expression, out var exprMotion))
             {
                 if (_groupExpressionManagers.TryGetValue(group, out var grpMgr))
                 {
-                    // Interruptable 表情立即清空旧队列，不留残影
                     if (item.Interruptable)
                     {
                         grpMgr.StopAllMotions();
                         _groupCurrentInterruptable[group] = true;
                     }
-                    grpMgr.StartMotionPriority(exprMotion, MotionPriority.PriorityForce);
+                    grpMgr.StartMotionPriority(exprMotion, item.Priority == 0 ? MotionPriority.PriorityNormal : (MotionPriority)item.Priority);
                 }
                 else
                     SetExpression(item.Expression);
             }
-            onFinishedMotionHandler?.Invoke(null!, null!);
+
+            // 立即触发 NextMtn 链（无动画文件时不等待结束）
+            chainCallback?.Invoke(null!, null!);
             return null;
         }
 
-        // 获取或创建组专用管理器
+        // 4. 有 File 的完整动画动作
         if (!_groupMotionManagers.TryGetValue(group, out var groupManager))
         {
             groupManager = new CubismMotionManager();
             _groupMotionManagers[group] = groupManager;
         }
 
-        // 同一组有动作播放时，根据 JSON 优先级判断是否抓占
+        // 优先级检查：当前有动作播放时，判断是否允许抢占
         if (!groupManager.IsFinished())
         {
+            var curPriority = _groupCurrentPriority.GetValueOrDefault(group, MotionPriority.PriorityNone);
             bool curInterruptable = _groupCurrentInterruptable.GetValueOrDefault(group);
-            int curPriority = _groupCurrentPriority.GetValueOrDefault(group);
-            if (!curInterruptable && item.Priority <= curPriority)
+            if (!curInterruptable && effectivePriority <= curPriority)
             {
-                CubismLog.Debug($"[Live2D App]can't start motion: priority {item.Priority} <= current {curPriority}.");
+                CubismLog.Debug($"[Live2D App]can't start motion [{name}]: priority {effectivePriority} <= current {curPriority}.");
                 return null;
             }
         }
 
-        if (priority == MotionPriority.PriorityForce)
+        if (effectivePriority == MotionPriority.PriorityForce)
         {
-            groupManager.ReservePriority = priority;
+            groupManager.ReservePriority = effectivePriority;
         }
-        else if (!groupManager.ReserveMotion(priority))
+        else if (!groupManager.ReserveMotion(effectivePriority))
         {
             CubismLog.Debug("[Live2D App]can't start motion.");
             return null;
         }
 
+        // 加载或从缓存获取动作数据
         if (!_motions.TryGetValue(name, out var value))
         {
             string path = Path.GetFullPath(_modelHomeDir + item.File);
@@ -639,18 +629,22 @@ public class LAppModel : CubismUserModel
 
             var newMotion = new CubismMotion(path);
             float fadeTime = item.FadeInTime;
-            if (fadeTime >= 0.0f)
-                newMotion.FadeInSeconds = fadeTime;
+            if (fadeTime >= 0.0f) newMotion.FadeInSeconds = fadeTime;
             fadeTime = item.FadeOutTime;
-            if (fadeTime >= 0.0f)
-                newMotion.FadeOutSeconds = fadeTime;
+            if (fadeTime >= 0.0f) newMotion.FadeOutSeconds = fadeTime;
             newMotion.SetEffectIds(_eyeBlinkIds, _lipSyncIds);
             _motions[name] = value = newMotion;
         }
         var motion = (CubismMotion)value!;
-        motion.OnFinishedMotion = onFinishedMotionHandler;
 
-        //voice
+        // 绑定完成回调（NextMtn 链仅在自然结束时触发）
+        motion.OnFinishedMotion = chainCallback;
+
+        // 应用表情
+        if (!string.IsNullOrEmpty(item.Expression))
+            SetExpression(item.Expression);
+
+        // 播放音效
         string voice = item.Sound;
         if (!string.IsNullOrWhiteSpace(voice))
         {
@@ -658,20 +652,74 @@ public class LAppModel : CubismUserModel
             _wavFileHandler.Start(soundPath, item.SoundDelay);
         }
 
-        _groupCurrentPriority[group] = item.Priority;
+        // 执行 VarFloat 赋值（动作确认启动后执行）
+        ExecuteVarFloatAssignments(item);
+
+        // 停止所有其他组中正在以待机优先级运行的动作，避免与本次动作参数冲突
+        if (effectivePriority > MotionPriority.PriorityIdle)
+        {
+            foreach (var (otherGroup, otherMgr) in _groupMotionManagers)
+            {
+                if (otherGroup == group) continue;
+                if (_groupCurrentPriority.GetValueOrDefault(otherGroup) == MotionPriority.PriorityIdle)
+                {
+                    otherMgr.StopAllMotions();
+                    _groupCurrentPriority[otherGroup] = MotionPriority.PriorityNone;
+                }
+            }
+        }
+
+        // 更新组状态
+        _groupCurrentPriority[group] = effectivePriority;
         _groupCurrentInterruptable[group] = item.Interruptable;
-        CubismLog.Debug($"[Live2D App]start motion: [{group}_{no}] priority={item.Priority} interruptable={item.Interruptable}");
-        return groupManager.StartMotionPriority(motion, priority);
+        CubismLog.Debug($"[Live2D App]start motion: [{name}] priority={effectivePriority} interruptable={item.Interruptable}");
+        return groupManager.StartMotionPriority(motion, effectivePriority);
+    }
+
+    /// <summary>
+    /// 尝试播放待机动作。应由外部（如定时器或帧调度器）按需调用。
+    /// 优先触发标准 Idle 组；若不存在，则遍历所有组内动作均带有 VarFloat 条件（Type=1）的组。
+    /// 只有对应组当前无动作播放时才会触发。
+    /// </summary>
+    /// <returns>true 表示成功触发了至少一个待机动作</returns>
+    public bool TryStartIdleMotion()
+    {
+        bool triggered = false;
+
+        // 标准 Idle 组
+        if (_groupMotionManagers.TryGetValue(LAppDefine.MotionGroupIdle, out var stdIdleMgr)
+            && stdIdleMgr.IsFinished())
+        {
+            triggered |= StartRandomMotion(LAppDefine.MotionGroupIdle, MotionPriority.PriorityIdle) != null;
+        }
+
+        // 条件型待机组（组内所有 Motion 均有 VarFloat Type=1 门控条件的组）
+        var motionDefs = _modelSetting.FileReferences?.Motions;
+        if (motionDefs != null)
+        {
+            foreach (var (group, mgr) in _groupMotionManagers)
+            {
+                if (group == LAppDefine.MotionGroupIdle) continue;
+                if (!mgr.IsFinished()) continue;
+                if (!motionDefs.TryGetValue(group, out var groupList) || groupList.Count == 0) continue;
+                if (groupList.All(m => m.VarFloats?.Any(v => v.Type == 1) == true))
+                {
+                    triggered |= StartRandomMotion(group, MotionPriority.PriorityIdle) != null;
+                }
+            }
+        }
+
+        return triggered;
     }
 
     /// <summary>
     /// 随机开始播放一个动作。
     /// </summary>
     /// <param name="group">动作组名称</param>
-    /// <param name="priority">优先级</param>
+    /// <param name="priority">优先级；PriorityNone 表示使用 JSON 定义的优先级</param>
     /// <param name="onFinishedMotionHandler">动作播放结束时调用的回调函数。为 NULL 时不调用。</param>
     /// <returns>返回已启动动作的标识号。无法启动时返回 "-1"。</returns>
-    public object? StartRandomMotion(string group, MotionPriority priority, FinishedMotionCallback? onFinishedMotionHandler = null)
+    public object? StartRandomMotion(string group, MotionPriority priority = MotionPriority.PriorityNone, FinishedMotionCallback? onFinishedMotionHandler = null)
     {
         var motionGroups = _modelSetting.FileReferences?.Motions;
         if (motionGroups != null && motionGroups.TryGetValue(group, out var groupList) && groupList.Count > 0)
@@ -754,6 +802,49 @@ public class LAppModel : CubismUserModel
             }
         }
         return false; // 不存在时返回 false
+    }
+
+    /// <summary>
+
+    /// 检查动作的 VarFloats 条件（Type=1）是否全部满足。
+    /// 所有条件均通过时返回 true，任意一条失败则返回 false。
+    /// </summary>
+    private bool CheckVarFloatConditions(ModelSettingObj.FileReference.Motion item)
+    {
+        if (item.VarFloats == null) return true;
+        foreach (var vf in item.VarFloats)
+        {
+            if (vf.Type != 1) continue;
+            var parts = vf.Code?.Split(' ', 2);
+            if (parts?.Length == 2 && parts[0] == "equal"
+                && float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float expected))
+            {
+                float current = _varFloats.GetValueOrDefault(vf.Name, 0f);
+                if (MathF.Abs(current - expected) > 1e-4f)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 执行动作的 VarFloats 赋值操作（Type=2）。
+    /// 应在动作确认可以启动后调用。
+    /// </summary>
+    private void ExecuteVarFloatAssignments(ModelSettingObj.FileReference.Motion item)
+    {
+        if (item.VarFloats == null) return;
+        foreach (var vf in item.VarFloats)
+        {
+            if (vf.Type != 2) continue;
+            var parts = vf.Code?.Split(' ', 2);
+            if (parts?.Length == 2 && parts[0] == "assign"
+                && float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float val))
+            {
+                _varFloats[vf.Name] = val;
+                CubismLog.Debug($"[Live2D App]VarFloat assign: {vf.Name} = {val}");
+            }
+        }
     }
 
     /// <summary>

@@ -13,6 +13,17 @@ public record ModelSettingObj
         }
         public record Motion
         {
+            /// <summary>
+            /// 条件或赋值变量项（Type=1 为条件检查，Type=2 为赋值操作）
+            /// </summary>
+            public record VarFloat
+            {
+                public string Name { get; set; }
+                /// <summary>1=条件（equal），2=赋值（assign）</summary>
+                public int Type { get; set; }
+                public string Code { get; set; }
+            }
+
             public string Name { get; set; }
             public string File { get; set; }
             public int WrapMode { get; set; }
@@ -24,6 +35,10 @@ public record ModelSettingObj
             public float FadeInTime { get; set; } = -1;
             public float FadeOutTime { get; set; } = -1;
             public bool Interruptable { get; set; }
+            /// <summary>
+            /// 状态变量列表：Type=1 在启动前检查条件，Type=2 在启动后执行赋值
+            /// </summary>
+            public List<VarFloat>? VarFloats { get; set; }
         }
         public string Moc { get; set; }
         public List<string> Textures { get; set; }

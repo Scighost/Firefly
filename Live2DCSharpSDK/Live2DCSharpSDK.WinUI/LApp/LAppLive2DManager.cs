@@ -107,7 +107,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
                     if (!string.IsNullOrEmpty(area.Motion) && model.HitTest(area.Name, tx, ty))
                     {
                         CubismLog.Debug($"[Live2D App]hit area: [{area.Name}] motion: [{area.Motion}]");
-                        model.StartMotionByRef(area.Motion, MotionPriority.PriorityForce);
+                        model.StartMotionByRef(area.Motion);
                         break;
                     }
                 }
