@@ -5,59 +5,59 @@ namespace Live2DCSharpSDK.WinUI.LApp;
 public class TouchManager
 {
     /// <summary>
-    /// タッチを開始した時のxの値
+    /// 触摸开始时的 x 値
     /// </summary>
     private float _startY;
     /// <summary>
-    /// タッチを開始した時のyの値
+    /// 触摸开始时的 y 値
     /// </summary>
     private float _startX;
     /// <summary>
-    /// シングルタッチ時のxの値
+    /// 单指触摸时的 x 値
     /// </summary>
     private float _lastX;
     /// <summary>
-    /// シングルタッチ時のyの値
+    /// 单指触摸时的 y 値
     /// </summary>
     private float _lastY;
     /// <summary>
-    /// ダブルタッチ時の一つ目のxの値
+    /// 双指触摸时第一根手指的 x 値
     /// </summary>
     private float _lastX1;
     /// <summary>
-    /// ダブルタッチ時の一つ目のyの値
+    /// 双指触摸时第一根手指的 y 値
     /// </summary>
     private float _lastY1;
     /// <summary>
-    /// ダブルタッチ時の二つ目のxの値
+    /// 双指触摸时第二根手指的 x 値
     /// </summary>
     private float _lastX2;
     /// <summary>
-    /// ダブルタッチ時の二つ目のyの値
+    /// 双指触摸时第二根手指的 y 値
     /// </summary>
     private float _lastY2;
     /// <summary>
-    /// 2本以上でタッチしたときの指の距離
+    /// 两根以上手指触摸时的手指间距
     /// </summary>
     private float _lastTouchDistance;
     /// <summary>
-    /// 前回の値から今回の値へのxの移動距離。
+    /// 从上次値到本次値的 x 移动距离。
     /// </summary>
     private float _deltaX;
     /// <summary>
-    /// 前回の値から今回の値へのyの移動距離。
+    /// 从上次値到本次値的 y 移动距离。
     /// </summary>
     private float _deltaY;
     /// <summary>
-    /// このフレームで掛け合わせる拡大率。拡大操作中以外は1。
+    /// 本帧的缩放倍率。非缩放操作时为 1。
     /// </summary>
     private float _scale;
     /// <summary>
-    /// シングルタッチ時はtrue
+    /// 单指触摸时为 true
     /// </summary>
     private bool _touchSingle;
     /// <summary>
-    /// フリップが有効かどうか
+    /// 是否启用轻扫
     /// </summary>
     private bool _flipAvailable;
 
@@ -84,10 +84,10 @@ public class TouchManager
     public void DisableFlick() { _flipAvailable = false; }
 
     /// <summary>
-    /// タッチ開始時イベント
+    /// 触摸开始事件
     /// </summary>
-    /// <param name="deviceX">タッチした画面のyの値</param>
-    /// <param name="deviceY">タッチした画面のxの値</param>
+    /// <param name="deviceX">触摸屏幕的 x 値</param>
+    /// <param name="deviceY">触摸屏幕的 y 値</param>
     public void TouchesBegan(float deviceX, float deviceY)
     {
         _lastX = deviceX;
@@ -100,10 +100,10 @@ public class TouchManager
     }
 
     /// <summary>
-    /// ドラッグ時のイベント
+    /// 单指拖拽事件
     /// </summary>
-    /// <param name="deviceX">タッチした画面のxの値</param>
-    /// <param name="deviceY">タッチした画面のyの値</param>
+    /// <param name="deviceX">触摸屏幕的 x 値</param>
+    /// <param name="deviceY">触摸屏幕的 y 値</param>
     public void TouchesMoved(float deviceX, float deviceY)
     {
         _lastX = deviceX;
@@ -113,12 +113,12 @@ public class TouchManager
     }
 
     /// <summary>
-    /// ドラッグ時のイベント
+    /// 双指拖拽事件
     /// </summary>
-    /// <param name="deviceX1">1つめのタッチした画面のxの値</param>
-    /// <param name="deviceY1">1つめのタッチした画面のyの値</param>
-    /// <param name="deviceX2">2つめのタッチした画面のxの値</param>
-    /// <param name="deviceY2">2つめのタッチした画面のyの値</param>
+    /// <param name="deviceX1">第 1 根手指触摸屏幕的 x 値</param>
+    /// <param name="deviceY1">第 1 根手指触摸屏幕的 y 値</param>
+    /// <param name="deviceX2">第 2 根手指触摸屏幕的 x 値</param>
+    /// <param name="deviceY2">第 2 根手指触摸屏幕的 y 値</param>
     public void TouchesMoved(float deviceX1, float deviceY1, float deviceX2, float deviceY2)
     {
         float distance = CalculateDistance(deviceX1, deviceY1, deviceX2, deviceY2);
@@ -149,34 +149,34 @@ public class TouchManager
     }
 
     /// <summary>
-    /// フリックの距離測定
+    /// 轻扫距离测量
     /// </summary>
-    /// <returns>フリック距離</returns>
+    /// <returns>轻扫距离</returns>
     public float GetFlickDistance()
     {
         return CalculateDistance(_startX, _startY, _lastX, _lastY);
     }
 
     /// <summary>
-    /// 点1から点2への距離を求める
+    /// 计算两点间的距离
     /// </summary>
-    /// <param name="x1">1つめのタッチした画面のxの値</param>
-    /// <param name="y1">1つめのタッチした画面のyの値</param>
-    /// <param name="x2">2つめのタッチした画面のxの値</param>
-    /// <param name="y2">2つめのタッチした画面のyの値</param>
-    /// <returns>2点の距離</returns>
+    /// <param name="x1">第 1 个触摸点的 x 値</param>
+    /// <param name="y1">第 1 个触摸点的 y 値</param>
+    /// <param name="x2">第 2 个触摸点的 x 値</param>
+    /// <param name="y2">第 2 个触摸点的 y 値</param>
+    /// <returns>两点间的距离</returns>
     public static float CalculateDistance(float x1, float y1, float x2, float y2)
     {
         return MathF.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     }
 
     /// <summary>
-    /// 二つの値から、移動量を求める。
-    /// 違う方向の場合は移動量０。同じ方向の場合は、絶対値が小さい方の値を参照する
+    /// 根据两个値计算移动量。
+    /// 方向相反时为 0，相同时取绝对値较小的値。
     /// </summary>
-    /// <param name="v1">1つめの移動量</param>
-    /// <param name="v2">2つめの移動量</param>
-    /// <returns>小さい方の移動量</returns>
+    /// <param name="v1">第一个移动量</param>
+    /// <param name="v2">第二个移动量</param>
+    /// <returns>较小的移动量</returns>
     public static float CalculateMovingAmount(float v1, float v2)
     {
         if ((v1 > 0.0f) != (v2 > 0.0f))

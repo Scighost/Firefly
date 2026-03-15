@@ -4,16 +4,16 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// 表情のモーションクラス。
+/// 表情动作类。
 /// </summary>
 public class CubismExpressionMotion : ACubismMotion
 {
     /// <summary>
-    /// 加算適用の初期値
+    /// 加算应用的初始値
     /// </summary>
     public const float DefaultAdditiveValue = 0.0f;
     /// <summary>
-    /// 乗算適用の初期値
+    /// 乘算应用的初始値
     /// </summary>
     public const float DefaultMultiplyValue = 1.0f;
 
@@ -29,20 +29,20 @@ public class CubismExpressionMotion : ACubismMotion
     public const float DefaultFadeTime = 1.0f;
 
     /// <summary>
-    /// 表情のパラメータ情報リスト
+    /// 表情参数信息列表
     /// </summary>
     public List<ExpressionParameter> Parameters { get; init; } = [];
 
     /// <summary>
-    /// 表情のフェードのウェイト値
+    /// 表情淡入淡出的权重値
     /// </summary>
-    [Obsolete("CubismExpressionMotion._fadeWeightが削除予定のため非推奨\nCubismExpressionMotionManager.getFadeWeight(int index) を使用してください。")]
+    [Obsolete("CubismExpressionMotion._fadeWeight计划删除，不建议使用\nCubismExpressionMotionManager.getFadeWeight(int index) 代替。")]
     public float FadeWeight { get; private set; }
 
     /// <summary>
-    /// インスタンスを作成する。
+    /// 创建实例。
     /// </summary>
-    /// <param name="buffer">expファイルが読み込まれているバッファ</param>
+    /// <param name="buf">已加载 exp 文件的缓冲区</param>
     public CubismExpressionMotion(string buf)
     {
         using var stream = File.Open(buf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -50,9 +50,9 @@ public class CubismExpressionMotion : ACubismMotion
         var json = obj.AsObject();
 
         FadeInSeconds = json.ContainsKey(ExpressionKeyFadeIn)
-            ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime;   // フェードイン
+            ? (float)json[ExpressionKeyFadeIn]! : DefaultFadeTime;   // 淡入
         FadeOutSeconds = json.ContainsKey(ExpressionKeyFadeOut)
-            ? (float)json[ExpressionKeyFadeOut]! : DefaultFadeTime; // フェードアウト
+            ? (float)json[ExpressionKeyFadeOut]! : DefaultFadeTime; // 淡出
 
         if (FadeInSeconds < 0.0f)
         {
@@ -64,17 +64,17 @@ public class CubismExpressionMotion : ACubismMotion
             FadeOutSeconds = DefaultFadeTime;
         }
 
-        // 各パラメータについて
+        // 逐一处理每个参数
         var list = json[ExpressionKeyParameters]!;
         int parameterCount = list.AsArray().Count;
 
         for (int i = 0; i < parameterCount; ++i)
         {
             var param = list[i]!;
-            var parameterId = CubismFramework.CubismIdManager.GetId(param[ExpressionKeyId]!.ToString()); // パラメータID
+            var parameterId = CubismFramework.CubismIdManager.GetId(param[ExpressionKeyId]!.ToString()); // 参数 ID
             var value = (float)param[ExpressionKeyValue]!; // 値
 
-            // 計算方法の設定
+            // 设置计算方式
             ExpressionBlendType blendType;
             var type = param[ExpressionKeyBlend]?.ToString();
             if (type == null || type == BlendValueAdd)
@@ -91,11 +91,11 @@ public class CubismExpressionMotion : ACubismMotion
             }
             else
             {
-                // その他 仕様にない値を設定したときは加算モードにすることで復旧
+                // 其他：设置了规格外的値时，以加算模式恢复
                 blendType = ExpressionBlendType.Add;
             }
 
-            // 設定オブジェクトを作成してリストに追加する
+            // 创建设置对象并添加到列表
             Parameters.Add(new()
             {
                 ParameterId = parameterId,
@@ -113,34 +113,34 @@ public class CubismExpressionMotion : ACubismMotion
             {
                 case ExpressionBlendType.Add:
                     {
-                        model.AddParameterValue(item.ParameterId, item.Value, weight);            // 相対変化 加算
+                        model.AddParameterValue(item.ParameterId, item.Value, weight);            // 相对变化 加算
                         break;
                     }
                 case ExpressionBlendType.Multiply:
                     {
-                        model.MultiplyParameterValue(item.ParameterId, item.Value, weight);       // 相対変化 乗算
+                        model.MultiplyParameterValue(item.ParameterId, item.Value, weight);       // 相对变化 乘算
                         break;
                     }
                 case ExpressionBlendType.Overwrite:
                     {
-                        model.SetParameterValue(item.ParameterId, item.Value, weight);            // 絶対変化 上書き
+                        model.SetParameterValue(item.ParameterId, item.Value, weight);            // 绝对变化 覆盖写入
                         break;
                     }
                 default:
-                    // 仕様にない値を設定したときは既に加算モードになっている
+                    // 设置了规格外的値时已是加算模式
                     break;
             }
         }
     }
 
     /// <summary>
-    /// モデルの表情に関するパラメータを計算する。
+    /// 计算与表情相关的模型参数。
     /// </summary>
-    /// <param name="model">対象のモデル</param>
-    /// <param name="userTimeSeconds">対象のモデル</param>
-    /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
-    /// <param name="expressionParameterValues">モデルに適用する各パラメータの値</param>
-    /// <param name="expressionIndex">表情のインデックス</param>
+    /// <param name="model">目标模型</param>
+    /// <param name="userTimeSeconds">目标模型时间</param>
+    /// <param name="motionQueueEntry">CubismMotionQueueManager 中管理的动作</param>
+    /// <param name="expressionParameterValues">应用到模型的各参数値</param>
+    /// <param name="expressionIndex">表情索引</param>
     public void CalculateExpressionParameters(CubismModel model, float userTimeSeconds, CubismMotionQueueEntry? motionQueueEntry,
     List<ExpressionParameterValue>? expressionParameterValues, int expressionIndex, float fadeWeight)
     {
@@ -154,11 +154,11 @@ public class CubismExpressionMotion : ACubismMotion
             return;
         }
 
-        // CubismExpressionMotion._fadeWeight は廃止予定です。
-        // 互換性のために処理は残りますが、実際には使用しておりません。
+        // CubismExpressionMotion._fadeWeight 计划删除。
+        // 为兼容性保留处理，但实际不使用。
         FadeWeight = UpdateFadeWeight(motionQueueEntry, userTimeSeconds);
 
-        // モデルに適用する値を計算
+        // 计算应用到模型的各参数値
         for (int i = 0; i < expressionParameterValues.Count; ++i)
         {
             ExpressionParameterValue expressionParameterValue = expressionParameterValues[i];
@@ -185,7 +185,7 @@ public class CubismExpressionMotion : ACubismMotion
                 break;
             }
 
-            // 再生中のExpressionが参照していないパラメータは初期値を適用
+            // 正在播放的 Expression 未引用的参数应用初始値
             if (parameterIndex < 0)
             {
                 if (expressionIndex == 0)
@@ -210,7 +210,7 @@ public class CubismExpressionMotion : ACubismMotion
                 continue;
             }
 
-            // 値を計算
+            // 计算倇
             float value = expressionParameters[parameterIndex].Value;
             float newAdditiveValue, newMultiplyValue, newSetValue;
             switch (expressionParameters[parameterIndex].BlendType)

@@ -1,7 +1,7 @@
 ﻿namespace Live2DCSharpSDK.Framework.Math;
 
 /// <summary>
-/// 4x4行列の便利クラス。
+/// 用于4x4矩阵的实用类。
 /// </summary>
 public record CubismMatrix44
 {
@@ -30,14 +30,14 @@ public record CubismMatrix44
     ];
 
     /// <summary>
-    /// 4x4行列データ
+    /// 4x4 矩阵数据
     /// </summary>
     protected float[] _tr = new float[16];
 
     public float[] Tr => _tr;
 
     /// <summary>
-    /// コンストラクタ。
+    /// 构造函数。
     /// </summary>
     public CubismMatrix44()
     {
@@ -45,7 +45,7 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// 単位行列に初期化する。
+    /// 初始化为单位矩阵。
     /// </summary>
     public void LoadIdentity()
     {
@@ -53,9 +53,9 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// 行列を設定する。
+    /// 设置矩阵。
     /// </summary>
-    /// <param name="tr">16個の浮動小数点数で表される4x4の行列</param>
+    /// <param name="tr">用 16 个浮点数表示的 4x4 矩阵</param>
     public void SetMatrix(float[] tr)
     {
         Array.Copy(tr, _tr, 16);
@@ -67,86 +67,86 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// X軸の拡大率を取得する。
+    /// 获取 X 轴的缩放比例。
     /// </summary>
-    /// <returns>X軸の拡大率</returns>
+    /// <returns>X 轴的缩放比例</returns>
     public float GetScaleX()
     {
         return _tr[0];
     }
 
     /// <summary>
-    /// Y軸の拡大率を取得する。
+    /// 获取 Y 轴的缩放比例。
     /// </summary>
-    /// <returns>Y軸の拡大率</returns>
+    /// <returns>Y 轴的缩放比例</returns>
     public float GetScaleY()
     {
         return _tr[5];
     }
 
     /// <summary>
-    /// X軸の移動量を取得する。
+    /// 获取 X 轴的平移量。
     /// </summary>
-    /// <returns>X軸の移動量</returns>
+    /// <returns>X 轴的平移量</returns>
     public float GetTranslateX()
     {
         return _tr[12];
     }
 
     /// <summary>
-    /// Y軸の移動量を取得する。
+    /// 获取 Y 轴的平移量。
     /// </summary>
-    /// <returns>Y軸の移動量</returns>
+    /// <returns>Y 轴的平移量</returns>
     public float GetTranslateY()
     {
         return _tr[13];
     }
 
     /// <summary>
-    /// X軸の値を現在の行列で計算する。
+    /// 使用当前矩阵变换 X 轴的值。
     /// </summary>
-    /// <param name="src">X軸の値</param>
-    /// <returns>現在の行列で計算されたX軸の値</returns>
+    /// <param name="src">X 轴的值</param>
+    /// <returns>经过当前矩阵计算得到的 X 轴值</returns>
     public float TransformX(float src)
     {
         return _tr[0] * src + _tr[12];
     }
 
     /// <summary>
-    /// Y軸の値を現在の行列で計算する。
+    /// 使用当前矩阵变换 Y 轴的值。
     /// </summary>
-    /// <param name="src">Y軸の値</param>
-    /// <returns>現在の行列で計算されたY軸の値</returns>
+    /// <param name="src">Y 轴的值</param>
+    /// <returns>经过当前矩阵计算得到的 Y 轴值</returns>
     public float TransformY(float src)
     {
         return _tr[5] * src + _tr[13];
     }
 
     /// <summary>
-    /// X軸の値を現在の行列で逆計算する。
+    /// 使用当前矩阵逆变换 X 轴的值。
     /// </summary>
-    /// <param name="src">X軸の値</param>
-    /// <returns>現在の行列で逆計算されたX軸の値</returns>
+    /// <param name="src">X 轴的值</param>
+    /// <returns>由当前矩阵逆变换得到的 X 轴值</returns>
     public float InvertTransformX(float src)
     {
         return (src - _tr[12]) / _tr[0];
     }
 
     /// <summary>
-    /// Y軸の値を現在の行列で逆計算する。
+    /// 使用当前矩阵逆变换 Y 轴的值。
     /// </summary>
-    /// <param name="src">Y軸の値</param>
-    /// <returns>現在の行列で逆計算されたY軸の値</returns>
+    /// <param name="src">Y 轴的值</param>
+    /// <returns>由当前矩阵逆变换得到的 Y 轴值</returns>
     public float InvertTransformY(float src)
     {
         return (src - _tr[13]) / _tr[5];
     }
 
     /// <summary>
-    /// 現在の行列の位置を起点にして相対的に移動する。
+    /// 以当前矩阵的位置为基准进行相对平移。
     /// </summary>
-    /// <param name="x">X軸の移動量</param>
-    /// <param name="y">Y軸の移動量</param>
+    /// <param name="x">X 轴的移动量</param>
+    /// <param name="y">Y 轴的移动量</param>
     public void TranslateRelative(float x, float y)
     {
         _mpt1[12] = x;
@@ -155,10 +155,10 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// 現在の行列の位置を指定した位置へ移動する。
+    /// 将当前矩阵的位置设置为指定位置。
     /// </summary>
-    /// <param name="x">X軸の移動量</param>
-    /// <param name="y">Y軸の移動量</param>
+    /// <param name="x">X 轴的移动量</param>
+    /// <param name="y">Y 轴的移动量</param>
     public void Translate(float x, float y)
     {
         _tr[12] = x;
@@ -166,28 +166,28 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// 現在の行列のX軸の位置を指定した位置へ移動する。
+    /// 将当前矩阵的 X 轴位置设置为指定位置。
     /// </summary>
-    /// <param name="x">X軸の移動量</param>
+    /// <param name="x">X 轴的移动量</param>
     public void TranslateX(float x)
     {
         _tr[12] = x;
     }
 
     /// <summary>
-    /// 現在の行列のY軸の位置を指定した位置へ移動する。
+    /// 将当前矩阵的 Y 轴位置设置为指定位置。
     /// </summary>
-    /// <param name="y">Y軸の移動量</param>
+    /// <param name="y">Y 轴的移动量</param>
     public void TranslateY(float y)
     {
         _tr[13] = y;
     }
 
     /// <summary>
-    /// 現在の行列の拡大率を相対的に設定する。
+    /// 相对设置当前矩阵的缩放比例。
     /// </summary>
-    /// <param name="x">X軸の拡大率</param>
-    /// <param name="y">Y軸の拡大率</param>
+    /// <param name="x">X 轴的缩放比例</param>
+    /// <param name="y">Y 轴的缩放比例</param>
     public void ScaleRelative(float x, float y)
     {
         _mpt2[0] = x;
@@ -196,10 +196,10 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// 現在の行列の拡大率を指定した倍率に設定する。
+    /// 将当前矩阵的缩放比例设置为指定值。
     /// </summary>
-    /// <param name="x">X軸の拡大率</param>
-    /// <param name="y">Y軸の拡大率</param>
+    /// <param name="x">X 轴的缩放比例</param>
+    /// <param name="y">Y 轴的缩放比例</param>
     public void Scale(float x, float y)
     {
         _tr[0] = x;
@@ -229,9 +229,9 @@ public record CubismMatrix44
     }
 
     /// <summary>
-    /// 現在の行列に行列を乗算する。
+    /// 将矩阵与当前矩阵相乘。
     /// </summary>
-    /// <param name="m">行列</param>
+    /// <param name="m">矩阵</param>
     public void MultiplyByMatrix(CubismMatrix44 m)
     {
         MultiplyByMatrix(m.Tr);

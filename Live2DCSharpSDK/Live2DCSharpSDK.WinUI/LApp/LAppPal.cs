@@ -1,14 +1,14 @@
 ﻿namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// プラットフォーム依存機能を抽象化する Cubism Platform Abstraction Layer.
-/// ファイル読み込みや時刻取得等のプラットフォームに依存する関数をまとめる
+/// 抽象化平台依赖功能的 Cubism Platform Abstraction Layer。
+/// 汇集文件读取、时间获取等平台依赖函数。
 /// </summary>
 public static class LAppPal
 {
     /// <summary>
-    /// デルタ時間（前回フレームとの差分）を取得する
+    /// 获取增量时间（与上一帧的差值）。
     /// </summary>
-    /// <returns>デルタ時間[ms]</returns>
+    /// <returns>增量时间[秒]</returns>
     public static float DeltaTime { get; set; }
 }

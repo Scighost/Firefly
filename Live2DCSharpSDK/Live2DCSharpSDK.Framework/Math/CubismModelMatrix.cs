@@ -1,7 +1,7 @@
 ﻿namespace Live2DCSharpSDK.Framework.Math;
 
 /// <summary>
-/// モデル座標設定用の4x4行列クラス。
+/// 用于模型坐标设置的 4x4 矩阵类。
 /// </summary>
 public record CubismModelMatrix : CubismMatrix44
 {
@@ -17,11 +17,11 @@ public record CubismModelMatrix : CubismMatrix44
     public const string KeyRight = "right";
 
     /// <summary>
-    /// 横幅
+    /// 宽度
     /// </summary>
     private readonly float _width;
     /// <summary>
-    /// 縦幅
+    /// 高度
     /// </summary>
     private readonly float _height;
 
@@ -34,9 +34,9 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// 横幅を設定する。
+    /// 设置宽度。
     /// </summary>
-    /// <param name="w">横幅</param>
+    /// <param name="w">宽度</param>
     public void SetWidth(float w)
     {
         float scaleX = w / _width;
@@ -45,9 +45,9 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// 縦幅を設定する。
+    /// 设置高度。
     /// </summary>
-    /// <param name="h">縦幅</param>
+    /// <param name="h">高度</param>
     public void SetHeight(float h)
     {
         float scaleX = h / _height;
@@ -56,20 +56,20 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// 位置を設定する。
+    /// 设置位置。
     /// </summary>
-    /// <param name="x">X軸の位置</param>
-    /// <param name="y">Y軸の位置</param>
+    /// <param name="x">X 轴的位置</param>
+    /// <param name="y">Y 轴的位置</param>
     public void SetPosition(float x, float y)
     {
         Translate(x, y);
     }
 
     /// <summary>
-    /// 中心位置を設定する。
+    /// 设置中心位置。
     /// </summary>
-    /// <param name="x">X軸の中心位置</param>
-    /// <param name="y">Y軸の中心位置</param>
+    /// <param name="x">X 轴的中心位置</param>
+    /// <param name="y">Y 轴的中心位置</param>
     public void SetCenterPosition(float x, float y)
     {
         CenterX(x);
@@ -77,18 +77,18 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// 上辺の位置を設定する。
+    /// 设置上边的位置。
     /// </summary>
-    /// <param name="y">上辺のY軸位置</param>
+    /// <param name="y">上边的 Y 轴位置</param>
     public void Top(float y)
     {
         SetY(y);
     }
 
     /// <summary>
-    /// 下辺の位置を設定する。
+    /// 设置下边的位置。
     /// </summary>
-    /// <param name="y">下辺のY軸位置</param>
+    /// <param name="y">下边的 Y 轴位置</param>
     public void Bottom(float y)
     {
         float h = _height * GetScaleY();
@@ -96,18 +96,18 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// 左辺の位置を設定する。
+    /// 设置左边的位置。
     /// </summary>
-    /// <param name="x">左辺のX軸位置</param>
+    /// <param name="x">左边的 X 轴位置</param>
     public void Left(float x)
     {
         SetX(x);
     }
 
     /// <summary>
-    /// 右辺の位置を設定する。
+    /// 设置右边的位置。
     /// </summary>
-    /// <param name="x">右辺のX軸位置</param>
+    /// <param name="x">右边的 X 轴位置</param>
     public void Right(float x)
     {
         float w = _width * GetScaleX();
@@ -115,9 +115,9 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// X軸の中心位置を設定する。
+    /// 设置 X 轴的中心位置。
     /// </summary>
-    /// <param name="x">X軸の中心位置</param>
+    /// <param name="x">X 轴的中心位置</param>
     public void CenterX(float x)
     {
         float w = _width * GetScaleX();
@@ -125,18 +125,18 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// X軸の位置を設定する。
+    /// 设置 X 轴的位置。
     /// </summary>
-    /// <param name="x">X軸の位置</param>
+    /// <param name="x">X 轴的位置</param>
     public void SetX(float x)
     {
         TranslateX(x);
     }
 
     /// <summary>
-    /// Y軸の中心位置を設定する。
+    /// 设置 Y 轴的中心位置。
     /// </summary>
-    /// <param name="y">Y軸の中心位置</param>
+    /// <param name="y">Y 轴的中心位置</param>
     public void CenterY(float y)
     {
         float h = _height * GetScaleY();
@@ -144,18 +144,18 @@ public record CubismModelMatrix : CubismMatrix44
     }
 
     /// <summary>
-    /// Y軸の位置を設定する。
+    /// 设置 Y 轴的位置。
     /// </summary>
-    /// <param name="y">Y軸の位置</param>
+    /// <param name="y">Y 轴的位置</param>
     public void SetY(float y)
     {
         TranslateY(y);
     }
 
     /// <summary>
-    /// レイアウト情報から位置を設定する。
+    /// 根据布局信息设置位置。
     /// </summary>
-    /// <param name="layout">レイアウト情報</param>
+    /// <param name="layout">布局信息</param>
     public void SetupFromLayout(Dictionary<string, float> layout)
     {
         foreach (var item in layout)

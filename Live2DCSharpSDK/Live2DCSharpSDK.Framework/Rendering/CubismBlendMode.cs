@@ -1,12 +1,12 @@
 ﻿namespace Live2DCSharpSDK.Framework.Rendering;
 
 /// <summary>
-/// カラーブレンディングのモード
+/// 颜色混合模式
 /// </summary>
 public enum CubismBlendMode
 {
     /// <summary>
-    /// 通常
+    /// 普通
     /// </summary>
     Normal = 0,
     /// <summary>
@@ -14,11 +14,11 @@ public enum CubismBlendMode
     /// </summary>
     Additive = 1,
     /// <summary>
-    /// 乗算
+    /// 乘法混合
     /// </summary>
     Multiplicative = 2,
     /// <summary>
-    /// マスク
+    /// 遠罩
     /// </summary>
     Mask = 3,
 };

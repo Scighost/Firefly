@@ -7,7 +7,7 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Physics;
 
 /// <summary>
-/// 物理演算のクラス。
+/// 物理计算类。
 /// </summary>
 public class CubismPhysics
 {
@@ -29,7 +29,7 @@ public class CubismPhysics
     public const float MaxDeltaTime = 5.0f;
 
     /// <summary>
-    /// 物理演算のデータ
+    /// 物理计算数据
     /// </summary>
     private readonly CubismPhysicsRig _physicsRig;
 
@@ -38,37 +38,37 @@ public class CubismPhysics
     /// </summary>
     public Vector2 Gravity;
     /// <summary>
-    /// 風の方向
+    /// 风向
     /// </summary>
     public Vector2 Wind;
 
     /// <summary>
-    /// 最新の振り子計算の結果
+    /// 最新摇锤计算结果
     /// </summary>
     private readonly List<float[]> _currentRigOutputs = [];
     /// <summary>
-    /// 一つ前の振り子計算の結果
+    /// 上一次摇锤计算结果
     /// </summary>
     private readonly List<float[]> _previousRigOutputs = [];
 
     /// <summary>
-    /// 物理演算が処理していない時間
+    /// 物理计算未处理的时间
     /// </summary>
     private float _currentRemainTime;
 
     /// <summary>
-    /// Evaluateで利用するパラメータのキャッシュs
+    /// Evaluate 使用的参数缓存
     /// </summary>
     private float[] _parameterCaches = [];
     /// <summary>
-    /// UpdateParticlesが動くときの入力をキャッシュ
+    /// UpdateParticles 运行时的输入缓存
     /// </summary>
     private float[] _parameterInputCaches = [];
 
     /// <summary>
-    /// インスタンスを作成する。
+    /// 创建实例。
     /// </summary>
-    /// <param name="buffer">physics3.jsonが読み込まれいるバッファ</param>
+    /// <param name="buffer">已加载 physics3.json 的缓冲区</param>
     public CubismPhysics(string buffer)
     {
         // set default options.
@@ -226,7 +226,7 @@ public class CubismPhysics
     }
 
     /// <summary>
-    /// パラメータをリセットする。
+    /// 重置参数。
     /// </summary>
     public void Reset()
     {
@@ -245,9 +245,9 @@ public class CubismPhysics
     }
 
     /// <summary>
-    /// 現在のパラメータ値で物理演算が安定化する状態を演算する。
+    /// 以当前参数値计算物理达到稳定状态。
     /// </summary>
-    /// <param name="model">物理演算の結果を適用するモデル</param>
+    /// <param name="model">应用物理计算结果的模型</param>
     public unsafe void Stabilization(CubismModel model)
     {
         float totalAngle;
@@ -383,30 +383,30 @@ public class CubismPhysics
     }
 
     /// <summary>
-    /// 物理演算を評価する。
+    /// 评估物理计算。
     /// Pendulum interpolation weights
     ///
-    /// 振り子の計算結果は保存され、パラメータへの出力は保存された前回の結果で補間されます。
+    /// 摆锤的计算结果会被保存，参数的输出将用上一次保存的摆锤结果进行插值。
     /// The result of the pendulum calculation is saved and
     /// the output to the parameters is interpolated with the saved previous result of the pendulum calculation.
     ///
-    /// 図で示すと[1]と[2]で補間されます。
+    /// 如图所示，在[1]与[2]之间进行插值。
     /// The figure shows the interpolation between [1] and [2].
     ///
-    /// 補間の重みは最新の振り子計算タイミングと次回のタイミングの間で見た現在時間で決定する。
+    /// 插值权重由最新摆锤计算时刻与下次时刻之间的当前时间决定。
     /// The weight of the interpolation are determined by the current time seen between
     /// the latest pendulum calculation timing and the next timing.
     ///
-    /// 図で示すと[2]と[4]の間でみた(3)の位置の重みになる。
+    /// 如图所示，权重为[2]与[4]之间的位置(3)的权重。
     /// Figure shows the weight of position (3) as seen between [2] and [4].
     ///
-    /// 解釈として振り子計算のタイミングと重み計算のタイミングがズレる。
+    /// 计算解释：摆锤计算时刻与权重计算时刻存在偏差。
     /// As an interpretation, the pendulum calculation and weights are misaligned.
     ///
-    /// physics3.jsonにFPS情報が存在しない場合は常に前の振り子状態で設定される。
+    /// 若 physics3.json 中不存在 FPS 信息，则始终使用上一次摆锤状态进行设置。
     /// If there is no FPS information in physics3.json, it is always set in the previous pendulum state.
     ///
-    /// この仕様は補間範囲を逸脱したことが原因の震えたような見た目を回避を目的にしている。
+    /// 此规格的目的是避免因超出插值范围而导致的抖动外观。
     /// The purpose of this specification is to avoid the quivering appearance caused by deviations from the interpolation range.
     ///
     /// ------------ time -------------->
@@ -423,8 +423,8 @@ public class CubismPhysics
     /// @param model
     /// @param deltaTimeSeconds  rendering delta time.
     /// </summary>
-    /// <param name="model">物理演算の結果を適用するモデル</param>
-    /// <param name="deltaTimeSeconds">デルタ時間[秒]</param>
+    /// <param name="model">应用物理计算结果的模型</param>
+    /// <param name="deltaTimeSeconds">增量时间[秒]</param>
     public unsafe void Evaluate(CubismModel model, float deltaTimeSeconds)
     {
         float totalAngle;
@@ -493,9 +493,9 @@ public class CubismPhysics
                 }
             }
 
-            // 入力キャッシュとパラメータで線形補間してUpdateParticlesするタイミングでの入力を計算する。
+            // 通过对输入缓存和参数进行线性插值，计算 UpdateParticles 时刻的输入。
             // Calculate the input at the timing to UpdateParticles by linear interpolation with the _parameterInputCaches and parameterValues.
-            // _parameterCachesはグループ間での値の伝搬の役割があるので_parameterInputCachesとの分離が必要。
+            // _parameterCaches 承担组间传播值的角色，需要与 _parameterInputCaches 分离。
             // _parameterCaches needs to be separated from _parameterInputCaches because of its role in propagating values between groups.
             float inputWeight = physicsDeltaTime / _currentRemainTime;
             for (int j = 0; j < model.GetParameterCount(); ++j)
@@ -604,7 +604,7 @@ public class CubismPhysics
     }
 
     /// <summary>
-    /// オプションを設定する。
+    /// 设置选项。
     /// </summary>
     public void SetOptions(Vector2 gravity, Vector2 wind)
     {
@@ -613,16 +613,16 @@ public class CubismPhysics
     }
 
     /// <summary>
-    /// オプションを取得する。
+    /// 获取选项。
     /// </summary>
-    /// <returns>オプション</returns>
+    /// <returns>选项</returns>
     public (Vector2 Gravity, Vector2 Wind) GetOptions()
     {
         return (Gravity, Wind);
     }
 
     /// <summary>
-    /// 初期化する。
+    /// 初始化。
     /// </summary>
     private void Initialize()
     {
@@ -659,10 +659,10 @@ public class CubismPhysics
     }
 
     /// <summary>
-    /// 振り子演算の最新の結果と一つ前の結果から指定した重みで適用する。
+    /// 以指定权重应用摆锤计算的最新结果与上一次结果。
     /// </summary>
-    /// <param name="model">物理演算の結果を適用するモデル</param>
-    /// <param name="weight">最新結果の重み</param>
+    /// <param name="model">应用物理计算结果的模型</param>
+    /// <param name="weight">最新结果的权重</param>
     private unsafe void Interpolate(CubismModel model, float weight)
     {
         int i, settingIndex;

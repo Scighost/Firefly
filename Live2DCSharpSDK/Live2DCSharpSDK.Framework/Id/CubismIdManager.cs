@@ -1,19 +1,19 @@
 ﻿namespace Live2DCSharpSDK.Framework.Id;
 
 /// <summary>
-/// ID名を管理する。
+/// 管理 ID 名称。
 /// </summary>
 public class CubismIdManager
 {
     /// <summary>
-    /// 登録されているIDのリスト
+    /// 已注册的 ID 列表
     /// </summary>
     private readonly List<string> _ids = [];
 
     /// <summary>
-    /// ID名をリストから登録する。
+    /// 将 ID 名从列表中注册。
     /// </summary>
-    /// <param name="list">ID名リスト</param>
+    /// <param name="list">ID 名列表</param>
     public void RegisterIds(List<string> list)
     {
         list.ForEach((item) =>
@@ -23,10 +23,10 @@ public class CubismIdManager
     }
 
     /// <summary>
-    /// ID名からIDを取得する。
-    /// 未登録のID名の場合、登録も行う。
+    /// 从 ID 名获取 ID。
+    /// 如果 ID 名尚未注册，则同时注册它。
     /// </summary>
-    /// <param name="item">ID名</param>
+    /// <param name="item">ID 名</param>
     public string GetId(string item)
     {
         if (_ids.Contains(item))

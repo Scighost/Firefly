@@ -4,57 +4,57 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// パラメータに適用する表情の値を持たせる構造体
+/// 应用到参数的表情偷的结构体
 /// </summary>
 public record ExpressionParameterValue
 {
     /// <summary>
-    /// パラメータID
+    /// 参数 ID
     /// </summary>
     public string ParameterId;
     /// <summary>
-    /// 加算値
+    /// 加算側
     /// </summary>
     public float AdditiveValue;
     /// <summary>
-    /// 乗算値
+    /// 乘算値
     /// </summary>
     public float MultiplyValue;
     /// <summary>
-    /// 上書き値
+    /// 覆盖写入值
     /// </summary>
     public float OverwriteValue;
 };
 
 public class CubismExpressionMotionManager : CubismMotionQueueManager
 {
-    // モデルに適用する各パラメータの値
+    // 应用到模型的各参数倗
     private readonly List<ExpressionParameterValue> _expressionParameterValues = [];
-    // 再生中の表情のウェイト
+    // 正在播放的表情的权重假
     private readonly List<float> _fadeWeights = [];
 
     /// <summary>
-    /// 現在再生中のモーションの優先度
+    /// 当前正在播放的动作的优先级
     /// </summary>
     public MotionPriority CurrentPriority { get; private set; }
     /// <summary>
-    /// 再生予定のモーションの優先度。再生中は0になる。モーションファイルを別スレッドで読み込むときの機能。
+    /// 即将播放的动作的优先级，播放中时为 0。在其他线程读取动作文件时使用的功能。
     /// </summary>
     public MotionPriority ReservePriority { get; set; }
 
     /// <summary>
-    /// 優先度を設定して表情モーションを開始する。
+    /// 按优先级启动表情动作。
     /// </summary>
-    /// <param name="motion">モーション</param>
-    /// <param name="priority">優先度</param>
-    /// <returns>開始したモーションの識別番号を返す。個別のモーションが終了したか否かを判定するIsFinished()の引数で使用する。開始できない時は「-1」</returns>
+    /// <param name="motion">动作</param>
+    /// <param name="priority">优先级</param>
+    /// <returns>返回已启动动作的标识编号，用于 IsFinished() 的判断参数。无法启动时返回 "-1"。</returns>
     public CubismMotionQueueEntry StartMotionPriority(ACubismMotion motion, MotionPriority priority)
     {
         if (priority == ReservePriority)
         {
-            ReservePriority = 0;           // 予約を解除
+            ReservePriority = 0;           // 取消预约
         }
-        CurrentPriority = priority;        // 再生中モーションの優先度を設定
+        CurrentPriority = priority;        // 设置正在播放的动作的优先级
 
         _fadeWeights.Add(0.0f);
 
@@ -62,12 +62,12 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     }
 
     /// <summary>
-    /// 表情モーションを更新して、モデルにパラメータ値を反映する。
+    /// 更新表情动作并将参数往应用到模型。
     /// </summary>
-    /// <param name="model">対象のモデル</param>
-    /// <param name="deltaTimeSeconds"> デルタ時間[秒]</param>
-    /// <returns>true    更新されている
-    /// false   更新されていない</returns>
+    /// <param name="model">目标模型</param>
+    /// <param name="deltaTimeSeconds">居陷时间[秒]</param>
+    /// <returns>true    已更新
+    /// false   未更新</returns>
     public bool UpdateMotion(CubismModel model, float deltaTimeSeconds)
     {
         UserTimeSeconds += deltaTimeSeconds;
@@ -77,8 +77,8 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
         float expressionWeight = 0.0f;
         int expressionIndex = 0;
 
-        // ------- 処理を行う --------
-        // 既にモーションがあれば終了フラグを立てる
+        // ------- 执行处理 --------
+        // 如果已有动作，置位结束标志
         var list = new List<CubismMotionQueueEntry>();
         for (int i1 = 0; i1 < motions.Count; i1++)
         {
@@ -92,7 +92,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
             List<ExpressionParameter> expressionParameters = expressionMotion.Parameters;
             if (item.Available)
             {
-                // 再生中のExpressionが参照しているパラメータをすべてリストアップ
+                // 将正在播放的 Expression 引用的所有参数列入列表
                 for (int i = 0; i < expressionParameters.Count; ++i)
                 {
                     if (expressionParameters[i].ParameterId == null)
@@ -101,7 +101,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
                     }
 
                     int index = -1;
-                    // リストにパラメータIDが存在するか検索
+                    // 在列表中搜索参数 ID 是否存在
                     for (int j = 0; j < _expressionParameterValues.Count; ++j)
                     {
                         if (_expressionParameterValues[j].ParameterId != expressionParameters[i].ParameterId)
@@ -118,7 +118,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
                         continue;
                     }
 
-                    // パラメータがリストに存在しないなら新規追加
+                    // 参数不在列表中则新建添加
                     ExpressionParameterValue item1 = new()
                     {
                         ParameterId = expressionParameters[i].ParameterId,
@@ -130,7 +130,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
                 }
             }
 
-            // ------ 値を計算する ------
+            // ------ 计算倇 ------
             expressionMotion.SetupMotionQueueEntry(item, UserTimeSeconds);
             _fadeWeights[expressionIndex] = expressionMotion.UpdateFadeWeight(item, UserTimeSeconds);
             expressionMotion.CalculateExpressionParameters(model, UserTimeSeconds,
@@ -144,20 +144,20 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
 
             if (item.IsTriggeredFadeOut)
             {
-                // フェードアウト開始
+                // 开始淡出
                 item.StartFadeout(item.FadeOutSeconds, UserTimeSeconds);
             }
 
             ++expressionIndex;
         }
 
-        // ----- 最新のExpressionのフェードが完了していればそれ以前を削除する ------
+        // ----- 最新 Expression 的淡入完成后删除之前的 Expression ------
         if (motions.Count > 1)
         {
             float latestFadeWeight = _fadeWeights[_fadeWeights.Count - 1];
             if (latestFadeWeight >= 1.0f)
             {
-                // 配列の最後の要素は削除しない
+                // 不删除数组最后一个元素
                 for (int i = motions.Count - 2; i >= 0; i--)
                 {
                     motions.RemoveAt(i);
@@ -171,7 +171,7 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
             expressionWeight = 1.0f;
         }
 
-        // モデルに各値を適用
+        // 将各倇应用到模型
         for (int i = 0; i < _expressionParameterValues.Count; ++i)
         {
             model.SetParameterValue(_expressionParameterValues[i].ParameterId,
@@ -186,10 +186,10 @@ public class CubismExpressionMotionManager : CubismMotionQueueManager
     }
 
     /// <summary>
-    /// 現在の表情のフェードのウェイト値を取得する。
+    /// 获取当前表情的淡入淡出权重値。
     /// </summary>
-    /// <param name="index">取得する表情モーションのインデックス</param>
-    /// <returns>表情のフェードのウェイト値</returns>
+    /// <param name="index">要获取的表情动作索引</param>
+    /// <returns>表情的淡入淡出权重値</returns>
     public float GetFadeWeight(int index)
     {
         return _fadeWeights[index];

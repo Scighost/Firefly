@@ -4,22 +4,22 @@ using Live2DCSharpSDK.Framework.Id;
 namespace Live2DCSharpSDK.Framework;
 
 /// <summary>
-/// Live2D Cubism Original Workflow SDKのエントリポイント
-/// 利用開始時はCubismFramework.Initialize()を呼び、CubismFramework.Dispose()で終了する。
+/// Live2D Cubism Original Workflow SDK 的入口点。
+/// 使用时请调用 CubismFramework.Initialize() 开始，调用 CubismFramework.Dispose() 结束。
 /// </summary>
 public static class CubismFramework
 {
     /// <summary>
-    /// メッシュ頂点のオフセット値
+    /// 网格顶点的偏移值
     /// </summary>
     public const int VertexOffset = 0;
     /// <summary>
-    /// メッシュ頂点のステップ値
+    /// 网格顶点的步长值
     /// </summary>
     public const int VertexStep = 2;
 
     /// <summary>
-    /// IDマネージャのインスタンスを取得する。
+    /// 获取 ID 管理器的实例。
     /// </summary>
     public static CubismIdManager CubismIdManager { get; private set; } = new();
 
@@ -29,14 +29,14 @@ public static class CubismFramework
     private static CubismOption? s_option;
 
     /// <summary>
-    /// Cubism FrameworkのAPIを使用可能にする。
-    /// APIを実行する前に必ずこの関数を実行すること。
-    /// 引数に必ずメモリアロケータを渡してください。
-    /// 一度準備が完了して以降は、再び実行しても内部処理がスキップされます。
+    /// 使 Cubism Framework 的 API 可用。
+    /// 在执行 API 之前必须调用此函数。
+    /// 请务必在参数中传入内存分配器。
+    /// 一旦准备完成，之后再次执行会跳过内部处理。
     /// </summary>
-    /// <param name="allocator">ICubismAllocatorクラスのインスタンス</param>
-    /// <param name="option">Optionクラスのインスタンス</param>
-    /// <returns>準備処理が完了したらtrueが返ります。</returns>
+    /// <param name="allocator">ICubismAllocator 类的实例</param>
+    /// <param name="option">Option 类的实例</param>
+    /// <returns>准备处理完成时返回 true。</returns>
     public static bool StartUp(ICubismAllocator allocator, CubismOption option)
     {
         if (IsStarted)
@@ -62,7 +62,7 @@ public static class CubismFramework
             IsStarted = true;
         }
 
-        //Live2D Cubism Coreバージョン情報を表示
+        // 显示 Live2D Cubism Core 版本信息
         if (IsStarted)
         {
             var version = CubismCore.GetVersion();
@@ -81,8 +81,8 @@ public static class CubismFramework
     }
 
     /// <summary>
-    /// StartUp()で初期化したCubismFrameworkの各パラメータをクリアします。
-    /// Dispose()したCubismFrameworkを再利用する際に利用してください。
+    /// 清除通过 StartUp() 初始化的 CubismFramework 的各参数。
+    /// 在要重新使用已 Dispose 的 CubismFramework 时使用。
     /// </summary>
     public static void CleanUp()
     {
@@ -90,18 +90,18 @@ public static class CubismFramework
     }
 
     /// <summary>
-    /// Core APIにバインドしたログ関数を実行する
+    /// 执行绑定到 Core API 的日志函数
     /// </summary>
-    /// <param name="data">ログメッセージ</param>
+    /// <param name="data">日志消息</param>
     public static void CoreLogFunction(string data)
     {
         CubismCore.GetLogFunction()?.Invoke(data);
     }
 
     /// <summary>
-    /// 現在のログ出力レベル設定の値を返す。
+    /// 返回当前日志输出级别的值。
     /// </summary>
-    /// <returns>現在のログ出力レベル設定の値</returns>
+    /// <returns>当前日志输出级别的值</returns>
     public static LogLevel GetLoggingLevel()
     {
         if (s_option != null)

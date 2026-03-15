@@ -3,26 +3,26 @@
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// モーション再生終了コールバック関数定義
+/// 动作播放结束回调函数定义
 /// </summary>
 public delegate void FinishedMotionCallback(CubismModel model, ACubismMotion self);
 
 /// <summary>
-/// イベントのコールバックに登録できる関数の型情報
+/// 可注册为事件回调的函数的类型信息
 /// </summary>
-/// <param name="eventValue">発火したイベントの文字列データ</param>
-/// <param name="customData">コールバックに返される登録時に指定されたデータ</param>
+/// <param name="eventValue">触发的事件字符串数据</param>
+/// <param name="customData">回调时返回的注册时指定的数据</param>
 public delegate void CubismMotionEventFunction(CubismUserModel? customData, string eventValue);
 
 /// <summary>
-/// モーションカーブのセグメントの評価関数。
+/// 动作曲线线段的评估函数。
 /// </summary>
-/// <param name="points">モーションカーブの制御点リスト</param>
-/// <param name="time">評価する時間[秒]</param>
+/// <param name="points">动作曲线的控制点列表</param>
+/// <param name="time">评估时间[秒]</param>
 public delegate float csmMotionSegmentEvaluationFunction(CubismMotionPoint[] points, int start, float time);
 
 /// <summary>
-/// モーションの優先度定数
+/// 动作优先级常量
 /// </summary>
 public enum MotionPriority : int
 {
@@ -33,7 +33,7 @@ public enum MotionPriority : int
 }
 
 /// <summary>
-/// 表情パラメータ値の計算方式
+/// 表情参数倗计算方式
 /// </summary>
 public enum ExpressionBlendType
 {
@@ -42,26 +42,26 @@ public enum ExpressionBlendType
     /// </summary>
     Add = 0,
     /// <summary>
-    /// 乗算
+    /// 乘算
     /// </summary>
     Multiply = 1,
     /// <summary>
-    /// 上書き
+    /// 覆盖写入
     /// </summary>
     Overwrite = 2
 };
 
 /// <summary>
-/// 表情のパラメータ情報の構造体。
+/// 表情参数信息的结构体。
 /// </summary>
 public record ExpressionParameter
 {
     /// <summary>
-    /// パラメータID
+    /// 参数 ID
     /// </summary>
     public required string ParameterId { get; set; }
     /// <summary>
-    /// パラメータの演算種類
+    /// 参数的运算类型
     /// </summary>
     public ExpressionBlendType BlendType { get; set; }
     /// <summary>
@@ -72,114 +72,114 @@ public record ExpressionParameter
 
 
 /// <summary>
-/// モーションカーブの種類。
+/// 动作曲线的目标类型。
 /// </summary>
 public enum CubismMotionCurveTarget
 {
     /// <summary>
-    /// モデルに対して
+    /// 针对模型
     /// </summary>
     Model,
     /// <summary>
-    /// パラメータに対して
+    /// 针对参数
     /// </summary>
     Parameter,
     /// <summary>
-    /// パーツの不透明度に対して
+    /// 针对部件不透明度
     /// </summary>
     PartOpacity
 };
 
 /// <summary>
-/// モーションカーブのセグメントの種類。
+/// 动作曲线线段的类型。
 /// </summary>
 public enum CubismMotionSegmentType : int
 {
     /// <summary>
-    /// リニア
+    /// 线性
     /// </summary>
     Linear = 0,
     /// <summary>
-    /// ベジェ曲線
+    /// 趝塞尔曲线
     /// </summary>
     Bezier = 1,
     /// <summary>
-    /// ステップ
+    /// 阶梯
     /// </summary>
     Stepped = 2,
     /// <summary>
-    /// インバースステップ
+    /// 逆阶梯
     /// </summary>
     InverseStepped = 3
 };
 
 /// <summary>
-/// モーションカーブの制御点。
+/// 动作曲线的控制点。
 /// </summary>
 public struct CubismMotionPoint
 {
     /// <summary>
-    /// 時間[秒]
+    /// 时间[秒]
     /// </summary>
     public float Time;
     /// <summary>
-    /// 値
+    /// 假
     /// </summary>
     public float Value;
 }
 
 /// <summary>
-/// モーションカーブのセグメント。
+/// 动作曲线线段。
 /// </summary>
 public record CubismMotionSegment
 {
     /// <summary>
-    /// 使用する評価関数
+    /// 使用的评估函数
     /// </summary>
     public csmMotionSegmentEvaluationFunction Evaluate;
     /// <summary>
-    /// 最初のセグメントへのインデックス
+    /// 第一个线段的索引
     /// </summary>
     public int BasePointIndex;
     /// <summary>
-    /// セグメントの種類
+    /// 线段类型
     /// </summary>
     public CubismMotionSegmentType SegmentType;
 }
 
 /// <summary>
-/// モーションカーブ。
+/// 动作曲线。
 /// </summary>
 public record CubismMotionCurve
 {
     /// <summary>
-    /// カーブの種類
+    /// 曲线类型
     /// </summary>
     public CubismMotionCurveTarget Type;
     /// <summary>
-    /// カーブのID
+    /// 曲线 ID
     /// </summary>
     public string Id;
     /// <summary>
-    /// セグメントの個数
+    /// 线段数量
     /// </summary>
     public int SegmentCount;
     /// <summary>
-    /// 最初のセグメントのインデックス
+    /// 第一个线段的索引
     /// </summary>
     public int BaseSegmentIndex;
     /// <summary>
-    /// フェードインにかかる時間[秒]
+    /// 淡入所需时间[秒]
     /// </summary>
     public float FadeInTime;
     /// <summary>
-    /// フェードアウトにかかる時間[秒]
+    /// 淡出所需时间[秒]
     /// </summary>
     public float FadeOutTime;
 }
 
 /// <summary>
-/// イベント。
+/// 事件。
 /// </summary>
 public record CubismMotionEvent
 {
@@ -188,44 +188,44 @@ public record CubismMotionEvent
 }
 
 /// <summary>
-/// モーションデータ。
+/// 动作数据。
 /// </summary>
 public record CubismMotionData
 {
     /// <summary>
-    /// モーションの長さ[秒]
+    /// 动作长度[秒]
     /// </summary>
     public float Duration;
     /// <summary>
-    /// ループするかどうか
+    /// 是否循环
     /// </summary>
     public bool Loop;
     /// <summary>
-    /// カーブの個数
+    /// 曲线数量
     /// </summary>
     public int CurveCount;
     /// <summary>
-    /// UserDataの個数
+    /// UserData 数量
     /// </summary>
     public int EventCount;
     /// <summary>
-    /// フレームレート
+    /// 帧率
     /// </summary>
     public float Fps;
     /// <summary>
-    /// カーブのリスト
+    /// 曲线列表
     /// </summary>
     public CubismMotionCurve[] Curves;
     /// <summary>
-    /// セグメントのリスト
+    /// 线段列表
     /// </summary>
     public CubismMotionSegment[] Segments;
     /// <summary>
-    /// ポイントのリスト
+    /// 控制点列表
     /// </summary>
     public CubismMotionPoint[] Points;
     /// <summary>
-    /// イベントのリスト
+    /// 事件列表
     /// </summary>
     public CubismMotionEvent[] Events;
 }

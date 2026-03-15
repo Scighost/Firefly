@@ -5,25 +5,25 @@ using System.Runtime.InteropServices;
 namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// メモリ確保・解放処理のインターフェースの実装。
-/// フレームワークから呼び出される。
+/// 内存分配与释放接口的实现。
+/// 由框架调用。
 /// </summary>
 public class LAppAllocator : ICubismAllocator
 {
     /// <summary>
-    /// メモリ領域を割り当てる。
+    /// 分配内存区域。
     /// </summary>
-    /// <param name="size">割り当てたいサイズ。</param>
-    /// <returns>指定したメモリ領域</returns>
+    /// <param name="size">要分配的大小。</param>
+    /// <returns>指定的内存区域</returns>
     public unsafe IntPtr Allocate(int size)
     {
         return (IntPtr)NativeMemory.AllocZeroed((nuint)size);
     }
 
     /// <summary>
-    /// メモリ領域を解放する
+    /// 释放内存区域。
     /// </summary>
-    /// <param name="memory">解放するメモリ。</param>
+    /// <param name="memory">要释放的内存。</param>
     public unsafe void Deallocate(IntPtr memory)
     {
         NativeMemory.Free((void*)memory);
@@ -32,9 +32,9 @@ public class LAppAllocator : ICubismAllocator
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="size">割り当てたいサイズ。</param>
-    /// <param name="alignment">割り当てたいサイズ。</param>
-    /// <returns>alignedAddress</returns>
+    /// <param name="size">要分配的大小。</param>
+    /// <param name="alignment">对齐字节数。</param>
+    /// <returns>对齐后的内存地址</returns>
     public unsafe IntPtr AllocateAligned(int size, int alignment)
     {
         return (IntPtr)NativeMemory.AlignedAlloc((nuint)size, (nuint)alignment);
@@ -43,7 +43,7 @@ public class LAppAllocator : ICubismAllocator
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="alignedMemory">解放するメモリ。</param>
+    /// <param name="alignedMemory">要释放的对齐内存。</param>
     public unsafe void DeallocateAligned(IntPtr alignedMemory)
     {
         NativeMemory.AlignedFree((void*)alignedMemory);

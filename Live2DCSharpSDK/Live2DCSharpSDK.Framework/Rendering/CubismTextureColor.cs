@@ -1,24 +1,24 @@
 ﻿namespace Live2DCSharpSDK.Framework.Rendering;
 
 /// <summary>
-/// テクスチャの色をRGBAで扱うための構造体
+/// 用 RGBA 处理纹理颜色的结构体
 /// </summary>
 public struct CubismTextureColor
 {
     /// <summary>
-    /// 赤チャンネル
+    /// 红通道
     /// </summary>
     public float R;
     /// <summary>
-    /// 緑チャンネル
+    /// 绿通道
     /// </summary>
     public float G;
     /// <summary>
-    /// 青チャンネル
+    /// 蓝通道
     /// </summary>
     public float B;
     /// <summary>
-    /// αチャンネル
+    /// Alpha 通道
     /// </summary>
     public float A;
 

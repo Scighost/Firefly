@@ -4,44 +4,44 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Rendering;
 
 /// <summary>
-/// モデル描画を処理するレンダラ
-/// サブクラスに環境依存の描画命令を記述する
+/// 处理模型绘制的渲染器
+/// 在子类中描述依赖环境的绘制指令
 /// </summary>
 public abstract class CubismRenderer
 {
     /// <summary>
-    /// テクスチャの異方性フィルタリングのパラメータ
+    /// 纹理各向异性过滤的参数
     /// </summary>
     public float Anisotropy { get; set; }
     /// <summary>
-    /// レンダリング対象のモデル
+    /// 渲染目标模型
     /// </summary>
     public CubismModel Model { get; private set; }
     /// <summary>
-    /// 乗算済みαならtrue
+    /// 已预乘 Alpha 时为 true
     /// </summary>
     public bool IsPremultipliedAlpha { get; set; }
     /// <summary>
-    /// カリングが有効ならtrue
+    /// 背面剔除有效时为 true
     /// </summary>
     public bool IsCulling { get; set; }
     /// <summary>
-    /// falseの場合、マスクを纏めて描画する trueの場合、マスクはパーツ描画ごとに書き直す
+    /// false 时统一绘制蒙板，true 时在每个部件绘制时重写蒙板
     /// </summary>
     public bool UseHighPrecisionMask { get; set; }
 
     /// <summary>
-    /// モデル自体のカラー(RGBA)
+    /// 模型自身的颜色（RGBA）
     /// </summary>
     public CubismTextureColor ModelColor = new();
 
     /// <summary>
-    /// Model-View-Projection 行列
+    /// MVP 矩阵
     /// </summary>
     private readonly CubismMatrix44 _mvpMatrix4x4 = new();
 
     /// <summary>
-    /// レンダラのインスタンスを生成して取得する
+    /// 创建并获取渲染器实例
     /// </summary>
     public CubismRenderer(CubismModel model)
     {
@@ -50,21 +50,21 @@ public abstract class CubismRenderer
     }
 
     /// <summary>
-    /// レンダラのインスタンスを解放する
+    /// 释放渲染器实例
     /// </summary>
     public abstract void Dispose();
 
     /// <summary>
-    /// モデルを描画する
+    /// 绘制模型
     /// </summary>
     public void DrawModel()
     {
         /**
-         * DoDrawModelの描画前と描画後に以下の関数を呼んでください。
-         * ・SaveProfile();
-         * ・RestoreProfile();
-         * これはレンダラの描画設定を保存・復帰させることで、
-         * モデル描画直前の状態に戻すための処理です。
+         * 请在 DoDrawModel 绘制前后调用以下函数。
+         * - SaveProfile();
+         * - RestoreProfile();
+         * 这是通过保存和恢复渲染器的绘制设置，
+         * 将状态恢复到模型绘制前的处理。
          */
 
         SaveProfile();
@@ -75,29 +75,29 @@ public abstract class CubismRenderer
     }
 
     /// <summary>
-    /// Model-View-Projection 行列をセットする
-    /// 配列は複製されるので元の配列は外で破棄して良い
+    /// 设置 MVP 矩阵
+    /// 数组会被复制，可在外部释放原始数组
     /// </summary>
-    /// <param name="matrix4x4">Model-View-Projection 行列</param>
+    /// <param name="matrix4x4">MVP 矩阵</param>
     public void SetMvpMatrix(CubismMatrix44 matrix4x4)
     {
         _mvpMatrix4x4.SetMatrix(matrix4x4.Tr);
     }
 
     /// <summary>
-    /// Model-View-Projection 行列を取得する
+    /// 获取 MVP 矩阵
     /// </summary>
-    /// <returns>Model-View-Projection 行列</returns>
+    /// <returns>MVP 矩阵</returns>
     public CubismMatrix44 GetMvpMatrix()
     {
         return _mvpMatrix4x4;
     }
 
     /// <summary>
-    /// 透明度を考慮したモデルの色を計算する。
+    /// 计算考虑不透明度后的模型颜色。
     /// </summary>
-    /// <param name="opacity">透明度</param>
-    /// <returns>RGBAのカラー情報</returns>
+    /// <param name="opacity">不透明度</param>
+    /// <returns>RGBA 颜色信息</returns>
     public CubismTextureColor GetModelColorWithOpacity(float opacity)
     {
         CubismTextureColor modelColorRGBA = new(ModelColor);
@@ -112,13 +112,13 @@ public abstract class CubismRenderer
     }
 
     /// <summary>
-    /// モデルの色をセットする。
-    /// 各色0.0f～1.0fの間で指定する(1.0fが標準の状態）。
+    /// 设置模型颜色。
+    /// 各颜色在 0.0f~1.0f 之间指定（1.0f 为标准状态）。
     /// </summary>
-    /// <param name="red">赤チャンネルの値</param>
-    /// <param name="green">緑チャンネルの値</param>
-    /// <param name="blue">青チャンネルの値</param>
-    /// <param name="alpha">αチャンネルの値</param>
+    /// <param name="red">红通道的倘</param>
+    /// <param name="green">绿通道的倘</param>
+    /// <param name="blue">蓝通道的倘</param>
+    /// <param name="alpha">Alpha 通道的倘</param>
     public void SetModelColor(float red, float green, float blue, float alpha)
     {
         if (red < 0.0f) red = 0.0f;
@@ -140,17 +140,17 @@ public abstract class CubismRenderer
     }
 
     /// <summary>
-    /// モデル描画の実装
+    /// 模型绘制的实现
     /// </summary>
     protected abstract void DoDrawModel();
 
     /// <summary>
-    /// モデル描画直前のレンダラのステートを保持する
+    /// 保存模型绘制前的渲染器状态
     /// </summary>
     protected abstract void SaveProfile();
 
     /// <summary>
-    /// モデル描画直前のレンダラのステートを復帰させる
+    /// 恢复模型绘制前的渲染器状态
     /// </summary>
     protected abstract void RestoreProfile();
 }

@@ -3,7 +3,7 @@
 namespace Live2DCSharpSDK.Framework.Model;
 
 /// <summary>
-/// テクスチャの色をRGBAで扱うための構造体
+/// 以 RGBA 格式管理纹理颜色的结构体
 /// </summary>
 public record DrawableColorData
 {

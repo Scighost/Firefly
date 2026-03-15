@@ -2,7 +2,7 @@
 
 public static class CubismDefaultParameterId
 {
-    // パーツID
+    // 部件 ID
     public const string HitAreaPrefix = "HitArea";
     public const string HitAreaHead = "Head";
     public const string HitAreaBody = "Body";
@@ -11,7 +11,7 @@ public static class CubismDefaultParameterId
     public const string PartsArmLPrefix = "Parts01ArmL_";
     public const string PartsArmRPrefix = "Parts01ArmR_";
 
-    // パラメータID
+    // 参数 ID
     public const string ParamAngleX = "ParamAngleX";
     public const string ParamAngleY = "ParamAngleY";
     public const string ParamAngleZ = "ParamAngleZ";

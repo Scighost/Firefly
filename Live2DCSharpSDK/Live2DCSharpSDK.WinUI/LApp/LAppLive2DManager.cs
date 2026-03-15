@@ -9,38 +9,38 @@ using System.IO;
 namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// サンプルアプリケーションにおいてCubismModelを管理するクラス
-/// モデル生成と破棄、タップイベントの処理、モデル切り替えを行う。
+/// 在示例应用程序中管理 CubismModel 的类。
+/// 执行模型的生成与销毁、点击事件处理及模型切换。
 /// </summary>
 /// <remarks>
-/// コンストラクタ
+/// 构造函数
 /// </remarks>
 public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
 {
     public event Action<CubismModel, ACubismMotion>? MotionFinished;
 
     /// <summary>
-    /// モデル描画に用いるView行列
+    /// 用于模型绘制的 View 矩阵
     /// </summary>
     public CubismMatrix44 ViewMatrix { get; } = new();
 
     /// <summary>
-    /// モデルインスタンスのコンテナ
+    /// 模型实例的容器
     /// </summary>
     private readonly List<LAppModel> _models = [];
 
     /// <summary>
-    /// 現在のシーンで保持しているモデルを返す
+    /// 返回当前场景中持有的模型
     /// </summary>
-    /// <param name="no">モデルリストのインデックス値</param>
-    /// <returns>モデルのインスタンスを返す。インデックス値が範囲外の場合はNULLを返す。</returns>
+    /// <param name="no">模型列表的索引値</param>
+    /// <returns>返回模型实例。索引値越界时返回 NULL。</returns>
     public LAppModel GetModel(int no)
     {
         return _models[no];
     }
 
     /// <summary>
-    /// 現在のシーンで保持しているすべてのモデルを解放する
+    /// 释放当前场景中持有的所有模型
     /// </summary>
     public void ReleaseAllModel()
     {
@@ -53,10 +53,10 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     }
 
     /// <summary>
-    /// 画面をドラッグしたときの処理
+    /// 拖拽屏幕时的处理
     /// </summary>
-    /// <param name="x">画面のX座標</param>
-    /// <param name="y">画面のY座標</param>
+    /// <param name="x">屏幕 X 坐标</param>
+    /// <param name="y">屏幕 Y 坐标</param>
     public void OnDrag(float x, float y)
     {
         for (int i = 0; i < _models.Count; i++)
@@ -68,10 +68,10 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     }
 
     /// <summary>
-    /// 画面をタップしたときの処理
+    /// 点击屏幕时的处理
     /// </summary>
-    /// <param name="x">画面のX座標</param>
-    /// <param name="y">画面のY座標</param>
+    /// <param name="x">屏幕 X 坐标</param>
+    /// <param name="y">屏幕 Y 坐标</param>
     public void OnTap(float x, float y)
     {
         CubismLog.Debug($"[Live2D App]tap point: x:{x:0.00} y:{y:0.00}");
@@ -124,8 +124,7 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     private readonly CubismMatrix44 _projection = new();
 
     /// <summary>
-    /// 画面を更新するときの処理
-    /// モデルの更新処理および描画処理を行う
+    /// 更新画面时的处理，执行模型更新和绘制处理
     /// </summary>
     public void OnUpdate()
     {
@@ -142,25 +141,25 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
 
             if (canvasW * height > canvasH * width)
             {
-                // キャンバスがウィンドウより横長: 横幅を基準にスケールしてはみ出しを防ぐ
+                // Canvas 比窗口宽：以宽度为基准缩放防止超出
                 model.ModelMatrix.SetWidth(2.0f);
                 _projection.Scale(1.0f, (float)width / height);
             }
             else
             {
-                // キャンバスがウィンドウより縦長または同じ: 縦幅を基準にスケール
+                // Canvas 比窗口高或相同：以高度为基准缩放
                 model.ModelMatrix.SetHeight(2.0f);
                 _projection.Scale((float)height / width, 1.0f);
             }
 
-            // 必要があればここで乗算
+            // 必要时在此进行矩阵乘法
             if (ViewMatrix != null)
             {
                 _projection.MultiplyByMatrix(ViewMatrix);
             }
 
             model.Update();
-            model.Draw(_projection); // 参照渡しなのでprojectionは変質する
+            model.Draw(_projection); // 传引用，projection 会被修改
         }
     }
 
@@ -168,9 +167,9 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     {
         CubismLog.Debug($"[Live2D App]model load: {name}");
 
-        // ModelDir[]に保持したディレクトリ名から
-        // model3.jsonのパスを決定する.
-        // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
+        // 根据 ModelDir[] 中保存的目录名
+        // 决定 model3.json 的路径。
+        // 请确保目录名与 model3.json 的名称一致。
         if (!dir.EndsWith('\\') && !dir.EndsWith('/'))
         {
             dir = Path.GetFullPath(dir + '/');
@@ -213,9 +212,9 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
     }
 
     /// <summary>
-    /// モデル個数を得る
+    /// 获取模型数量
     /// </summary>
-    /// <returns>所持モデル個数</returns>
+    /// <returns>持有的模型数量</returns>
     public int GetModelNum()
     {
         return _models.Count;

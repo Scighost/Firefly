@@ -7,7 +7,7 @@ namespace Live2DCSharpSDK.Framework.Model;
 public class CubismModel : IDisposable
 {
     /// <summary>
-    /// モデル
+    /// 模型
     /// </summary>
     public IntPtr Model { get; }
 
@@ -16,80 +16,80 @@ public class CubismModel : IDisposable
     public readonly List<string> DrawableIds = [];
 
     /// <summary>
-    /// 存在していないパーツの不透明度のリスト
+    /// 不存在部件的不透明度列表
     /// </summary>
     private readonly Dictionary<int, float> _notExistPartOpacities = [];
     /// <summary>
-    /// 存在していないパーツIDのリスト
+    /// 不存在部件 ID 的列表
     /// </summary>
     private readonly Dictionary<string, int> _notExistPartId = [];
     /// <summary>
-    /// 存在していないパラメータの値のリスト
+    /// 不存在参数值的列表
     /// </summary>
     private readonly Dictionary<int, float> _notExistParameterValues = [];
     /// <summary>
-    /// 存在していないパラメータIDのリスト
+    /// 不存在参数 ID 的列表
     /// </summary>
     private readonly Dictionary<string, int> _notExistParameterId = [];
     /// <summary>
-    /// 保存されたパラメータ
+    /// 已保存的参数
     /// </summary>
     private readonly List<float> _savedParameters = [];
     /// <summary>
-    /// パラメータの値のリスト
+    /// 参数值列表
     /// </summary>
     private readonly unsafe float* _parameterValues;
     /// <summary>
-    /// パラメータの最大値のリスト
+    /// 参数最大值列表
     /// </summary>
     private readonly unsafe float* _parameterMaximumValues;
     /// <summary>
-    /// パラメータの最小値のリスト
+    /// 参数最小值列表
     /// </summary>
     private readonly unsafe float* _parameterMinimumValues;
     /// <summary>
-    /// パーツの不透明度のリスト
+    /// 部件不透明度列表
     /// </summary>
     private readonly unsafe float* _partOpacities;
     /// <summary>
-    /// モデルの不透明度
+    /// 模型不透明度
     /// </summary>
     private float _modelOpacity;
 
     /// <summary>
-    /// Drawable 乗算色の配列
+    /// Drawable 的屏幕色数组
     /// </summary>
     private readonly List<DrawableColorData> _userScreenColors = [];
     /// <summary>
-    /// Drawable スクリーン色の配列
+    /// Drawable 的乘算色数组
     /// </summary>
     private readonly List<DrawableColorData> _userMultiplyColors = [];
     /// <summary>
-    /// カリング設定の配列
+    /// 剔除（Culling）设置数组
     /// </summary>
     private readonly List<DrawableCullingData> _userCullings = [];
     /// <summary>
-    /// Part 乗算色の配列
+    /// 部件的屏幕色数组
     /// </summary>
     private readonly List<PartColorData> _userPartScreenColors = [];
     /// <summary>
-    /// Part スクリーン色の配列
+    /// 部件的乘算色数组
     /// </summary>
     private readonly List<PartColorData> _userPartMultiplyColors = [];
     /// <summary>
-    /// Partの子DrawableIndexの配列
+    /// 部件的子 Drawable 索引数组
     /// </summary>
     private readonly List<int>[] _partChildDrawables;
     /// <summary>
-    /// 乗算色を全て上書きするか？
+    /// 是否覆盖所有乘算色？
     /// </summary>
     private bool _isOverwrittenModelMultiplyColors;
     /// <summary>
-    /// スクリーン色を全て上書きするか？
+    /// 是否覆盖所有屏幕色？
     /// </summary>
     private bool _isOverwrittenModelScreenColors;
     /// <summary>
-    /// モデルのカリング設定をすべて上書きするか？
+    /// 是否覆盖模型的所有剔除设置？
     /// </summary>
     private bool _isOverwrittenCullings;
 
@@ -128,31 +128,31 @@ public class CubismModel : IDisposable
         var drawableIds = CubismCore.GetDrawableIds(Model);
         var drawableCount = CubismCore.GetDrawableCount(Model);
 
-        // カリング設定
+        // 剔除设置
         var userCulling = new DrawableCullingData()
         {
             IsOverwritten = false,
             IsCulling = false
         };
 
-        // 乗算色
+        // 乘算色
         var multiplyColor = new CubismTextureColor();
 
-        // スクリーン色
+        // 屏幕色
         var screenColor = new CubismTextureColor(0, 0, 0, 1.0f);
 
-        // Parts
+        // 部件
         for (int i = 0; i < partCount; ++i)
         {
             _userPartMultiplyColors.Add(new()
             {
                 IsOverwritten = false,
-                Color = multiplyColor // 乗算色
+                Color = multiplyColor // 乘算色
             });
             _userPartScreenColors.Add(new()
             {
                 IsOverwritten = false,
-                Color = screenColor // スクリーン色
+                Color = screenColor // 屏幕色
             });
         }
 
@@ -164,12 +164,12 @@ public class CubismModel : IDisposable
             _userMultiplyColors.Add(new()
             {
                 IsOverwritten = false,
-                Color = multiplyColor // 乗算色
+                Color = multiplyColor // 乘算色
             });
             _userScreenColors.Add(new()
             {
                 IsOverwritten = false,
-                Color = screenColor   // スクリーン色
+                Color = screenColor   // 屏幕色
             });
             _userCullings.Add(userCulling);
 
@@ -188,7 +188,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partのOverwriteColor Set関数
+    /// 设置部件覆盖颜色的函数
     /// </summary>
     public void SetPartColor(int partIndex, float r, float g, float b, float a,
        List<PartColorData> partColors, List<DrawableColorData> drawableColors)
@@ -212,7 +212,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partのOverwriteFlag Set関数
+    /// 设置部件覆盖标志的函数
     /// </summary>
     public void SetOverwriteColorForPartColors(int partIndex, bool value,
         List<PartColorData> partColors, List<DrawableColorData> drawableColors)
@@ -234,7 +234,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// モデルのパラメータを更新する。
+    /// 更新模型的参数。
     /// </summary>
     public void Update()
     {
@@ -245,9 +245,9 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Pixel単位でキャンバスの幅の取得
+    /// 以像素为单位获取画布宽度。
     /// </summary>
-    /// <returns>キャンバスの幅(pixel)</returns>
+    /// <returns>画布宽度（像素）</returns>
     public float GetCanvasWidthPixel()
     {
         if (Model == IntPtr.Zero)
@@ -261,9 +261,9 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Pixel単位でキャンバスの高さの取得
+    /// 以像素为单位获取画布高度。
     /// </summary>
-    /// <returns>キャンバスの高さ(pixel)</returns>
+    /// <returns>画布高度（像素）</returns>
     public float GetCanvasHeightPixel()
     {
         if (new IntPtr(Model) == IntPtr.Zero)
@@ -277,9 +277,9 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// PixelsPerUnitを取得する。
+    /// 获取每单位像素数（PixelsPerUnit）。
     /// </summary>
-    /// <returns>PixelsPerUnit</returns>
+    /// <returns>每单位像素数（PixelsPerUnit）</returns>
     public float GetPixelsPerUnit()
     {
         if (new IntPtr(Model) == IntPtr.Zero)
@@ -293,9 +293,9 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Unit単位でキャンバスの幅の取得
+    /// 以单位为单位获取画布宽度。
     /// </summary>
-    /// <returns>キャンバスの幅(Unit)</returns>
+    /// <returns>画布宽度（单位）</returns>
     public float GetCanvasWidth()
     {
         CubismCore.ReadCanvasInfo(Model, out var tmpSizeInPixels, out _, out var tmpPixelsPerUnit);
@@ -304,9 +304,9 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Unit単位でキャンバスの高さの取得
+    /// 以单位为单位获取画布高度。
     /// </summary>
-    /// <returns>キャンバスの高さ(Unit)</returns>
+    /// <returns>画布高度（单位）</returns>
     public float GetCanvasHeight()
     {
         CubismCore.ReadCanvasInfo(Model, out var tmpSizeInPixels, out _, out var tmpPixelsPerUnit);
@@ -315,10 +315,10 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パーツのインデックスを取得する。
+    /// 获取部件的索引。
     /// </summary>
-    /// <param name="partId">パーツのID</param>
-    /// <returns>パーツのインデックス</returns>
+    /// <param name="partId">部件的ID</param>
+    /// <returns>部件的索引</returns>
     public int GetPartIndex(string partId)
     {
         int partIndex = PartIds.IndexOf(partId);
@@ -329,13 +329,13 @@ public class CubismModel : IDisposable
 
         int partCount = CubismCore.GetPartCount(Model);
 
-        // モデルに存在していない場合、非存在パーツIDリスト内にあるかを検索し、そのインデックスを返す
+        // 如果模型中不存在该部件，则在不存在部件 ID 列表中查找并返回其索引
         if (_notExistPartId.TryGetValue(partId, out var item))
         {
             return item;
         }
 
-        // 非存在パーツIDリストにない場合、新しく要素を追加する
+        // 若不存在于不存在部件 ID 列表，则新增一项
         partIndex = partCount + _notExistPartId.Count;
 
         _notExistPartId.TryAdd(partId, partIndex);
@@ -345,10 +345,10 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パーツのIDを取得する。
+    /// 获取部件的 ID。
     /// </summary>
-    /// <param name="partIndex">パーツのIndex</param>
-    /// <returns>パーツのID</returns>
+    /// <param name="partIndex">部件索引</param>
+    /// <returns>部件的 ID</returns>
     public unsafe string GetPartId(int partIndex)
     {
         if (0 <= partIndex && partIndex < PartIds.Count)
@@ -359,37 +359,37 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パーツの個数を取得する。
+    /// 获取部件数量。
     /// </summary>
-    /// <returns>パーツの個数</returns>
+    /// <returns>部件数量</returns>
     public int GetPartCount()
     {
         return CubismCore.GetPartCount(Model);
     }
 
     /// <summary>
-    /// パーツの不透明度を設定する。
+    /// 设置部件的不透明度。
     /// </summary>
-    /// <param name="partId">パーツのID</param>
+    /// <param name="partId">部件的 ID</param>
     /// <param name="opacity">不透明度</param>
     public void SetPartOpacity(string partId, float opacity)
     {
-        // 高速化のためにPartIndexを取得できる機構になっているが、外部からの設定の時は呼び出し頻度が低いため不要
+        // 为了性能有获取 PartIndex 的机制，但从外部设置时调用频率较低，所以不用
         int index = GetPartIndex(partId);
 
         if (index < 0)
         {
-            return; // パーツが無いのでスキップ
+            return; // 部件不存在，跳过
         }
 
         SetPartOpacity(index, opacity);
     }
 
     /// <summary>
-    /// パーツの不透明度を設定する。
+    /// 设置部件的不透明度。
     /// </summary>
-    /// <param name="partIndex">パーツのインデックス</param>
-    /// <param name="opacity">パーツの不透明度</param>
+    /// <param name="partIndex">部件索引</param>
+    /// <param name="opacity">部件不透明度</param>
     public unsafe void SetPartOpacity(int partIndex, float opacity)
     {
         if (_notExistPartOpacities.ContainsKey(partIndex))
@@ -398,7 +398,7 @@ public class CubismModel : IDisposable
             return;
         }
 
-        //インデックスの範囲内検知
+        // 索引范围检查
         if (0 > partIndex || partIndex >= GetPartCount())
         {
             throw new ArgumentException($"partIndex out of range");
@@ -408,37 +408,37 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パーツの不透明度を取得する。
+    /// 获取部件的不透明度。
     /// </summary>
-    /// <param name="partId">パーツのID</param>
-    /// <returns>パーツの不透明度</returns>
+    /// <param name="partId">部件 ID</param>
+    /// <returns>部件不透明度</returns>
     public float GetPartOpacity(string partId)
     {
-        // 高速化のためにPartIndexを取得できる機構になっているが、外部からの設定の時は呼び出し頻度が低いため不要
+        // 为了性能有获取 PartIndex 的机制，但从外部设置时调用频率较低，所以不需要
         int index = GetPartIndex(partId);
 
         if (index < 0)
         {
-            return 0; //パーツが無いのでスキップ
+            return 0; // 部件不存在，跳过
         }
 
         return GetPartOpacity(index);
     }
 
     /// <summary>
-    /// パーツの不透明度を取得する。
+    /// 获取部件的不透明度。
     /// </summary>
-    /// <param name="partIndex">パーツのインデックス</param>
-    /// <returns>パーツの不透明度</returns>
+    /// <param name="partIndex">部件索引</param>
+    /// <returns>部件不透明度</returns>
     public unsafe float GetPartOpacity(int partIndex)
     {
         if (_notExistPartOpacities.TryGetValue(partIndex, out float value))
         {
-            // モデルに存在しないパーツIDの場合、非存在パーツリストから不透明度を返す
+            // 若为模型中不存在的部件 ID，则从不存在部件列表返回不透明度
             return value;
         }
 
-        //インデックスの範囲内検知
+        // 索引范围检查
         if (0 > partIndex || partIndex >= GetPartCount())
         {
             throw new ArgumentException($"partIndex out of range");
@@ -448,10 +448,10 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータのインデックスを取得する。
+    /// 获取参数的索引。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <returns>パラメータのインデックス</returns>
+    /// <param name="parameterId">参数 ID</param>
+    /// <returns>参数索引</returns>
     public int GetParameterIndex(string parameterId)
     {
         int parameterIndex = ParameterIds.IndexOf(parameterId);
@@ -460,13 +460,13 @@ public class CubismModel : IDisposable
             return parameterIndex;
         }
 
-        // モデルに存在していない場合、非存在パラメータIDリスト内を検索し、そのインデックスを返す
+        // 如果模型中不存在该参数，则在不存在参数 ID 列表中查找并返回其索引
         if (_notExistParameterId.TryGetValue(parameterId, out var data))
         {
             return data;
         }
 
-        // 非存在パラメータIDリストにない場合、新しく要素を追加する
+        // 若不存在于不存在参数 ID 列表，则新增一项
         parameterIndex = CubismCore.GetParameterCount(Model) + _notExistParameterId.Count;
 
         _notExistParameterId.TryAdd(parameterId, parameterIndex);
@@ -476,72 +476,72 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの個数を取得する。
+    /// 获取参数个数。
     /// </summary>
-    /// <returns>パラメータの個数</returns>
+    /// <returns>参数个数</returns>
     public int GetParameterCount()
     {
         return CubismCore.GetParameterCount(Model);
     }
 
     /// <summary>
-    /// パラメータの種類を取得する。
+    /// 获取参数类型。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <returns>csmParameterType_Normal -> 通常のパラメータ
-    /// csmParameterType_BlendShape -> ブレンドシェイプパラメータ</returns>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <returns>csmParameterType_Normal -> 普通参数
+    /// csmParameterType_BlendShape -> BlendShape（混合形状）参数</returns>
     public unsafe int GetParameterType(int parameterIndex)
     {
         return CubismCore.GetParameterTypes(Model)[parameterIndex];
     }
 
     /// <summary>
-    /// パラメータの最大値を取得する。
+    /// 获取参数的最大值。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <returns>パラメータの最大値</returns>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <returns>参数最大值</returns>
     public unsafe float GetParameterMaximumValue(int parameterIndex)
     {
         return CubismCore.GetParameterMaximumValues(Model)[parameterIndex];
     }
 
     /// <summary>
-    /// パラメータの最小値を取得する。
+    /// 获取参数的最小值。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <returns>パラメータの最小値</returns>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <returns>参数最小值</returns>
     public unsafe float GetParameterMinimumValue(int parameterIndex)
     {
         return CubismCore.GetParameterMinimumValues(Model)[parameterIndex];
     }
 
     /// <summary>
-    /// パラメータのデフォルト値を取得する。
+    /// 获取参数的默认值。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <returns> パラメータのデフォルト値</returns>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <returns>参数默认值</returns>
     public unsafe float GetParameterDefaultValue(int parameterIndex)
     {
         return CubismCore.GetParameterDefaultValues(Model)[parameterIndex];
     }
 
     /// <summary>
-    /// パラメータの値を取得する。
+    /// 获取参数的当前值。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <returns>パラメータの値</returns>
+    /// <param name="parameterId">参数 ID</param>
+    /// <returns>参数值</returns>
     public float GetParameterValue(string parameterId)
     {
-        // 高速化のためにParameterIndexを取得できる機構になっているが、外部からの設定の時は呼び出し頻度が低いため不要
+        // 为了性能有获取 ParameterIndex 的机制，但从外部设置时调用频率较低，所以不用
         int parameterIndex = GetParameterIndex(parameterId);
         return GetParameterValue(parameterIndex);
     }
 
     /// <summary>
-    /// パラメータの値を取得する。
+    /// 获取参数的当前值。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <returns>パラメータの値</returns>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <returns>参数值</returns>
     public unsafe float GetParameterValue(int parameterIndex)
     {
         if (_notExistParameterValues.TryGetValue(parameterIndex, out var item))
@@ -549,7 +549,7 @@ public class CubismModel : IDisposable
             return item;
         }
 
-        //インデックスの範囲内検知
+        // 索引范围检查
         if (0 > parameterIndex || parameterIndex >= GetParameterCount())
         {
             throw new ArgumentException($"parameterIndex out of range");
@@ -559,11 +559,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの値を設定する。
+    /// 设置参数的值。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <param name="value">パラメータの値</param>
-    /// <param name="weight">重み</param>
+    /// <param name="parameterId">参数 ID</param>
+    /// <param name="value">参数值</param>
+    /// <param name="weight">权重</param>
     public void SetParameterValue(string parameterId, float value, float weight = 1.0f)
     {
         int index = GetParameterIndex(parameterId);
@@ -571,11 +571,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの値を設定する。
+    /// 设置参数的值。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <param name="value">パラメータの値</param>
-    /// <param name="weight">重み</param>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <param name="value">参数值</param>
+    /// <param name="weight">权重</param>
     public unsafe void SetParameterValue(int parameterIndex, float value, float weight = 1.0f)
     {
         if (_notExistParameterValues.TryGetValue(parameterIndex, out float value1))
@@ -585,7 +585,7 @@ public class CubismModel : IDisposable
             return;
         }
 
-        //インデックスの範囲内検知
+        // 索引范围检查
         if (0 > parameterIndex || parameterIndex >= GetParameterCount())
         {
             throw new ArgumentException($"parameterIndex out of range");
@@ -606,11 +606,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの値を加算する。
+    /// 对参数值进行加法操作。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <param name="value">加算する値</param>
-    /// <param name="weight">重み</param>
+    /// <param name="parameterId">参数 ID</param>
+    /// <param name="value">要加的值</param>
+    /// <param name="weight">权重</param>
     public void AddParameterValue(string parameterId, float value, float weight = 1.0f)
     {
         int index = GetParameterIndex(parameterId);
@@ -618,11 +618,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの値を加算する。
+    /// 对参数值进行加法操作。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <param name="value">加算する値</param>
-    /// <param name="weight">重み</param>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <param name="value">要加的值</param>
+    /// <param name="weight">权重</param>
     public void AddParameterValue(int parameterIndex, float value, float weight = 1.0f)
     {
         if (parameterIndex == -1)
@@ -631,11 +631,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの値を乗算する。
+    /// 对参数值进行乘法操作。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <param name="value">乗算する値</param>
-    /// <param name="weight">重み</param>
+    /// <param name="parameterId">参数 ID</param>
+    /// <param name="value">乘数</param>
+    /// <param name="weight">权重</param>
     public void MultiplyParameterValue(string parameterId, float value, float weight = 1.0f)
     {
         int index = GetParameterIndex(parameterId);
@@ -643,11 +643,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータの値を乗算する。
+    /// 对参数值进行乘法操作。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのインデックス</param>
-    /// <param name="value">乗算する値</param>
-    /// <param name="weight">重み</param>
+    /// <param name="parameterIndex">参数索引</param>
+    /// <param name="value">乘数</param>
+    /// <param name="weight">权重</param>
     public void MultiplyParameterValue(int parameterIndex, float value, float weight = 1.0f)
     {
         if (parameterIndex == -1)
@@ -656,29 +656,29 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableのインデックスを取得する。
+    /// 获取 Drawable 的索引。
     /// </summary>
-    /// <param name="drawableId">DrawableのID</param>
-    /// <returns>Drawableのインデックス</returns>
+    /// <param name="drawableId">Drawable 的 ID</param>
+    /// <returns>Drawable 的索引</returns>
     public int GetDrawableIndex(string drawableId)
     {
         return DrawableIds.IndexOf(drawableId);
     }
 
     /// <summary>
-    /// Drawableの個数を取得する。
+    /// 获取 Drawable 的数量。
     /// </summary>
-    /// <returns>Drawableの個数</returns>
+    /// <returns>Drawable 的数量</returns>
     public int GetDrawableCount()
     {
         return CubismCore.GetDrawableCount(Model);
     }
 
     /// <summary>
-    /// DrawableのIDを取得する。
+    /// 获取 Drawable 的 ID。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>DrawableのID</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的 ID</returns>
     public unsafe string GetDrawableId(int drawableIndex)
     {
         if (0 <= drawableIndex && drawableIndex < DrawableIds.Count)
@@ -689,30 +689,29 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableの描画順リストを取得する。
+    /// 获取 Drawable 的绘制顺序列表。
     /// </summary>
-    /// <returns>Drawableの描画順リスト</returns>
+    /// <returns>Drawable 的绘制顺序列表</returns>
     public unsafe int* GetDrawableRenderOrders()
     {
         return CubismCore.GetDrawableRenderOrders(Model);
     }
 
     /// <summary>
-    /// Drawableのテクスチャインデックスリストの取得
-    /// 関数名が誤っていたため、代替となる getDrawableTextureIndex を追加し、この関数は非推奨となりました。
+    /// 获取 Drawable 的纹理索引（旧函数名已误，已添加替代函数 getDrawableTextureIndex，本函数已弃用）。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableのテクスチャインデックスリスト</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的纹理索引</returns>
     public int GetDrawableTextureIndices(int drawableIndex)
     {
         return GetDrawableTextureIndex(drawableIndex);
     }
 
     /// <summary>
-    /// Drawableのテクスチャインデックスを取得する。
+    /// 获取 Drawable 的纹理索引。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableのテクスチャインデックス</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的纹理索引</returns>
     public unsafe int GetDrawableTextureIndex(int drawableIndex)
     {
         var textureIndices = CubismCore.GetDrawableTextureIndices(Model);
@@ -720,110 +719,110 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableの頂点インデックスの個数を取得する。
+    /// 获取 Drawable 的顶点索引数量。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの頂点インデックスの個数</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的顶点索引数量</returns>
     public unsafe int GetDrawableVertexIndexCount(int drawableIndex)
     {
         return CubismCore.GetDrawableIndexCounts(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの頂点の個数を取得する。
+    /// 获取 Drawable 的顶点数量。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの頂点の個数</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的顶点数量</returns>
     public unsafe int GetDrawableVertexCount(int drawableIndex)
     {
         return CubismCore.GetDrawableVertexCounts(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの頂点リストを取得する。
+    /// 获取 Drawable 的顶点列表。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの頂点リスト</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的顶点列表</returns>
     public unsafe float* GetDrawableVertices(int drawableIndex)
     {
         return (float*)GetDrawableVertexPositions(drawableIndex);
     }
 
     /// <summary>
-    /// Drawableの頂点インデックスリストを取得する。
+    /// 获取 Drawable 的顶点索引列表。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの頂点インデックスリスト</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的顶点索引列表</returns>
     public unsafe ushort* GetDrawableVertexIndices(int drawableIndex)
     {
         return CubismCore.GetDrawableIndices(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの頂点リストを取得する。
+    /// 获取 Drawable 的顶点列表（Vector2）。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの頂点リスト</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的顶点列表</returns>
     public unsafe Vector2* GetDrawableVertexPositions(int drawableIndex)
     {
         return CubismCore.GetDrawableVertexPositions(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの頂点のUVリストを取得する。
+    /// 获取 Drawable 的顶点 UV 列表。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの頂点のUVリスト</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的顶点 UV 列表</returns>
     public unsafe Vector2* GetDrawableVertexUvs(int drawableIndex)
     {
         return CubismCore.GetDrawableVertexUvs(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの不透明度を取得する。
+    /// 获取 Drawable 的不透明度。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの不透明度</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的不透明度</returns>
     public unsafe float GetDrawableOpacity(int drawableIndex)
     {
         return CubismCore.GetDrawableOpacities(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの乗算色を取得する。
+    /// 获取 Drawable 的乘算色。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableの乗算色</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的乘算色</returns>
     public unsafe Vector4 GetDrawableMultiplyColor(int drawableIndex)
     {
         return CubismCore.GetDrawableMultiplyColors(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableのスクリーン色を取得する。
+    /// 获取 Drawable 的屏幕色。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableのスクリーン色</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的屏幕色</returns>
     public unsafe Vector4 GetDrawableScreenColor(int drawableIndex)
     {
         return CubismCore.GetDrawableScreenColors(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableの親パーツのインデックスを取得する。
+    /// 获取 Drawable 的父部件索引。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>drawableの親パーツのインデックス</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的父部件索引</returns>
     public unsafe int GetDrawableParentPartIndex(int drawableIndex)
     {
         return CubismCore.GetDrawableParentPartIndices(Model)[drawableIndex];
     }
 
     /// <summary>
-    /// Drawableのブレンドモードを取得する。
+    /// 获取 Drawable 的混合模式（Blend Mode）。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableのブレンドモード</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的混合模式</returns>
     public unsafe CubismBlendMode GetDrawableBlendMode(int drawableIndex)
     {
         var constantFlags = CubismCore.GetDrawableConstantFlags(Model)[drawableIndex];
@@ -835,11 +834,10 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableのマスク使用時の反転設定を取得する。
-    /// マスクを使用しない場合は無視される
+    /// 获取 Drawable 在使用遮罩时的反转设置。若不使用遮罩则忽略。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableのマスクの反転設定</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>Drawable 的遮罩反转设置</returns>
     public unsafe bool GetDrawableInvertedMask(int drawableIndex)
     {
         var constantFlags = CubismCore.GetDrawableConstantFlags(Model)[drawableIndex];
@@ -847,11 +845,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableの表示情報を取得する。
+    /// 获取 Drawable 的显示信息。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableが表示
-    /// false   Drawableが非表示</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 可见
+    /// false   Drawable 不可见</returns>
     public unsafe bool GetDrawableDynamicFlagIsVisible(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -859,11 +857,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 直近のCubismModel::Update関数でDrawableの表示状態が変化したかを取得する。
+    /// 获取在最近一次 CubismModel::Update 调用中，Drawable 的显示状态是否发生变化。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableの表示状態が直近のCubismModel::Update関数で変化した
-    /// false   Drawableの表示状態が直近のCubismModel::Update関数で変化していない</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 的显示状态在最近一次 Update 中发生变化
+    /// false   Drawable 的显示状态在最近一次 Update 中未发生变化</returns>
     public unsafe bool GetDrawableDynamicFlagVisibilityDidChange(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -871,11 +869,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 直近のCubismModel::Update関数でDrawableの不透明度が変化したかを取得する。
+    /// 获取在最近一次 CubismModel::Update 调用中，Drawable 的不透明度是否发生变化。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableの不透明度が直近のCubismModel::Update関数で変化した
-    /// false   Drawableの不透明度が直近のCubismModel::Update関数で変化していない</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 的不透明度在最近一次 Update 中发生变化
+    /// false   Drawable 的不透明度在最近一次 Update 中未发生变化</returns>
     public unsafe bool GetDrawableDynamicFlagOpacityDidChange(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -883,12 +881,12 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 直近のCubismModel::Update関数でDrawableのDrawOrderが変化したかを取得する。
-    /// DrawOrderはArtMesh上で指定する0から1000の情報
+    /// 获取在最近一次 CubismModel::Update 调用中，Drawable 的 DrawOrder 是否发生变化。
+    /// DrawOrder 在 ArtMesh 上指定，取值范围为 0 到 1000。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableの不透明度が直近のCubismModel::Update関数で変化した
-    /// false   Drawableの不透明度が直近のCubismModel::Update関数で変化していない</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 的 DrawOrder 在最近一次 Update 中发生变化
+    /// false   Drawable 的 DrawOrder 在最近一次 Update 中未发生变化</returns>
     public unsafe bool GetDrawableDynamicFlagDrawOrderDidChange(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -896,11 +894,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 直近のCubismModel::Update関数でDrawableの描画の順序が変化したかを取得する。
+    /// 获取在最近一次 CubismModel::Update 调用中，Drawable 的渲染顺序是否发生变化。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableの描画の順序が直近のCubismModel::Update関数で変化した
-    /// false   Drawableの描画の順序が直近のCubismModel::Update関数で変化していない</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 的渲染顺序在最近一次 Update 中发生变化
+    /// false   Drawable 的渲染顺序在最近一次 Update 中未发生变化</returns>
     public unsafe bool GetDrawableDynamicFlagRenderOrderDidChange(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -908,11 +906,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 直近のCubismModel::Update関数でDrawableの頂点情報が変化したかを取得する。
+    /// 获取在最近一次 CubismModel::Update 调用中，Drawable 的顶点信息是否发生变化。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableの頂点情報が直近のCubismModel::Update関数で変化した
-    /// false   Drawableの頂点情報が直近のCubismModel::Update関数で変化していない</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 的顶点信息在最近一次 Update 中发生变化
+    /// false   Drawable 的顶点信息在最近一次 Update 中未发生变化</returns>
     public unsafe bool GetDrawableDynamicFlagVertexPositionsDidChange(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -920,11 +918,11 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 直近のCubismModel::Update関数でDrawableの乗算色・スクリーン色が変化したかを取得する。
+    /// 获取在最近一次 CubismModel::Update 调用中，Drawable 的乘算色或屏幕色是否发生变化。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>true    Drawableの乗算色・スクリーン色が直近のCubismModel::Update関数で変化した
-    /// false   Drawableの乗算色・スクリーン色が直近のCubismModel::Update関数で変化していない</returns>
+    /// <param name="drawableIndex">Drawable 索引</param>
+    /// <returns>true    Drawable 的乘算色/屏幕色在最近一次 Update 中发生变化
+    /// false   Drawable 的乘算色/屏幕色在最近一次 Update 中未发生变化</returns>
     public unsafe bool GetDrawableDynamicFlagBlendColorDidChange(int drawableIndex)
     {
         var dynamicFlags = CubismCore.GetDrawableDynamicFlags(Model)[drawableIndex];
@@ -932,28 +930,28 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableのクリッピングマスクリストを取得する。
+    /// 获取 Drawable 的裁剪掩码列表。
     /// </summary>
-    /// <returns>Drawableのクリッピングマスクリスト</returns>
+    /// <returns>Drawable 的裁剪掩码列表</returns>
     public unsafe int** GetDrawableMasks()
     {
         return CubismCore.GetDrawableMasks(Model);
     }
 
     /// <summary>
-    /// Drawableのクリッピングマスクの個数リストを取得する。
+    /// 获取 Drawable 的裁剪掩码数量列表。
     /// </summary>
-    /// <returns>Drawableのクリッピングマスクの個数リスト</returns>
+    /// <returns>Drawable 的裁剪掩码数量列表</returns>
     public unsafe int* GetDrawableMaskCounts()
     {
         return CubismCore.GetDrawableMaskCounts(Model);
     }
 
     /// <summary>
-    /// クリッピングマスクを使用しているかどうか？
+    /// 是否使用裁剪掩码？
     /// </summary>
-    /// <returns>true    クリッピングマスクを使用している
-    /// false   クリッピングマスクを使用していない</returns>
+    /// <returns>true    使用裁剪掩码
+    /// false   未使用裁剪掩码</returns>
     public unsafe bool IsUsingMasking()
     {
         for (int d = 0; d < CubismCore.GetDrawableCount(Model); ++d)
@@ -969,7 +967,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// 保存されたパラメータを読み込む
+    /// 读取已保存的参数
     /// </summary>
     public unsafe void LoadParameters()
     {
@@ -988,7 +986,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータを保存する。
+    /// 保存参数。
     /// </summary>
     public unsafe void SaveParameters()
     {
@@ -1013,7 +1011,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// drawableの乗算色を取得する
+    /// 获取 Drawable 的乘算色（外部可覆盖）。
     /// </summary>
     public CubismTextureColor GetMultiplyColor(int drawableIndex)
     {
@@ -1029,7 +1027,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    ///  drawableのスクリーン色を取得する
+    /// 获取 Drawable 的屏幕色（外部可覆盖）。
     /// </summary>
     public CubismTextureColor GetScreenColor(int drawableIndex)
     {
@@ -1044,7 +1042,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// drawableの乗算色を設定する
+    /// 设置 Drawable 的乘算色
     /// </summary>
     public void SetMultiplyColor(int drawableIndex, CubismTextureColor color)
     {
@@ -1052,7 +1050,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// drawableの乗算色を設定する
+    /// 设置 Drawable 的乘算色
     /// </summary>
     public void SetMultiplyColor(int drawableIndex, float r, float g, float b, float a = 1.0f)
     {
@@ -1063,7 +1061,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// drawableのスクリーン色を設定する
+    /// 设置 Drawable 的屏幕色
     /// </summary>
     /// <param name="drawableIndex"></param>
     /// <param name="color"></param>
@@ -1073,7 +1071,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// drawableのスクリーン色を設定する
+    /// 设置 Drawable 的屏幕色
     /// </summary>
     public void SetScreenColor(int drawableIndex, float r, float g, float b, float a = 1.0f)
     {
@@ -1084,7 +1082,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partの乗算色を取得する
+    /// 获取部件的乘算色
     /// </summary>
     public CubismTextureColor GetPartMultiplyColor(int partIndex)
     {
@@ -1092,7 +1090,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partの乗算色を取得する
+    /// 获取部件的屏幕色
     /// </summary>
     public CubismTextureColor GetPartScreenColor(int partIndex)
     {
@@ -1100,7 +1098,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partのスクリーン色を設定する
+    /// 设置部件的乘算色
     /// </summary>
     public void SetPartMultiplyColor(int partIndex, CubismTextureColor color)
     {
@@ -1108,7 +1106,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partの乗算色を設定する
+    /// 设置部件的乘算色
     /// </summary>
     public void SetPartMultiplyColor(int partIndex, float r, float g, float b, float a = 1.0f)
     {
@@ -1116,7 +1114,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partのスクリーン色を設定する
+    /// 设置部件的屏幕色
     /// </summary>
     public void SetPartScreenColor(int partIndex, CubismTextureColor color)
     {
@@ -1124,7 +1122,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// partのスクリーン色を設定する
+    /// 设置部件的屏幕色
     /// </summary>
     /// <param name="a"></param>
     public void SetPartScreenColor(int partIndex, float r, float g, float b, float a = 1.0f)
@@ -1133,28 +1131,27 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからモデル全体の乗算色を上書きするか。
+    /// 是否用 SDK 的颜色信息覆盖模型整体的乘算色？
     /// </summary>
-    /// <returns>true    ->  SDK上の色情報を使用
-    /// false   ->  モデルの色情報を使用</returns>
+    /// <returns>true -> 使用 SDK 上的颜色信息
+    /// false -> 使用模型自身的颜色信息</returns>
     public bool GetOverwriteFlagForModelMultiplyColors()
     {
         return _isOverwrittenModelMultiplyColors;
     }
 
     /// <summary>
-    /// SDKからモデル全体のスクリーン色を上書きするか。
+    /// 是否用 SDK 的颜色信息覆盖模型整体的屏幕色？
     /// </summary>
-    /// <returns>true    ->  SDK上の色情報を使用
-    /// false   ->  モデルの色情報を使用</returns>
+    /// <returns>true -> 使用 SDK 上的颜色信息
+    /// false -> 使用模型自身的颜色信息</returns>
     public bool GetOverwriteFlagForModelScreenColors()
     {
         return _isOverwrittenModelScreenColors;
     }
 
     /// <summary>
-    /// SDKからモデル全体の乗算色を上書きするかをセットする
-    /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
+    /// 设置是否用 SDK 的颜色信息覆盖模型整体的乘算色（true 使用 SDK，false 使用模型）。
     /// </summary>
     public void SetOverwriteFlagForModelMultiplyColors(bool value)
     {
@@ -1162,8 +1159,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからモデル全体のスクリーン色を上書きするかをセットする
-    /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
+    /// 设置是否用 SDK 的颜色信息覆盖模型整体的屏幕色（true 使用 SDK，false 使用模型）。
     /// </summary>
     public void SetOverwriteFlagForModelScreenColors(bool value)
     {
@@ -1171,28 +1167,27 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからdrawableの乗算色を上書きするか。
+    /// 是否用 SDK 的颜色信息覆盖 drawable 的乘算色？
     /// </summary>
-    /// <returns>true    ->  SDK上の色情報を使用
-    /// false   ->  モデルの色情報を使用</returns>
+    /// <returns>true -> 使用 SDK 上的颜色信息
+    /// false -> 使用模型自身的颜色信息</returns>
     public bool GetOverwriteFlagForDrawableMultiplyColors(int drawableIndex)
     {
         return _userMultiplyColors[drawableIndex].IsOverwritten;
     }
 
     /// <summary>
-    /// SDKからdrawableのスクリーン色を上書きするか。
+    /// 是否用 SDK 的颜色信息覆盖 drawable 的屏幕色？
     /// </summary>
-    /// <returns>true    ->  SDK上の色情報を使用
-    /// false   ->  モデルの色情報を使用</returns>
+    /// <returns>true -> 使用 SDK 上的颜色信息
+    /// false -> 使用模型自身的颜色信息</returns>
     public bool GetOverwriteFlagForDrawableScreenColors(int drawableIndex)
     {
         return _userScreenColors[drawableIndex].IsOverwritten;
     }
 
     /// <summary>
-    /// SDKからdrawableの乗算色を上書きするかをセットする
-    /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
+    /// 设置是否用 SDK 的颜色信息覆盖 drawable 的乘算色（true 使用 SDK，false 使用模型）。
     /// </summary>
     public void SetOverwriteFlagForDrawableMultiplyColors(int drawableIndex, bool value)
     {
@@ -1200,8 +1195,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからdrawableのスクリーン色を上書きするかをセットする
-    /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
+    /// 设置是否用 SDK 的颜色信息覆盖 drawable 的屏幕色（true 使用 SDK，false 使用模型）。
     /// </summary>
     public void SetOverwriteFlagForDrawableScreenColors(int drawableIndex, bool value)
     {
@@ -1209,18 +1203,17 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからpartの乗算色を上書きするか。
+    /// 是否用 SDK 的颜色信息覆盖 part 的乘算色。
     /// </summary>
-    /// <returns>true    ->  SDK上の色情報を使用
-    /// false   ->  モデルの色情報を使用</returns>
+    /// <returns>true → 使用 SDK 颜色信息
+    /// false → 使用模型颜色信息</returns>
     public bool GetOverwriteColorForPartMultiplyColors(int partIndex)
     {
         return _userPartMultiplyColors[partIndex].IsOverwritten;
     }
 
     /// <summary>
-    /// SDKからpartのスクリーン色を上書きするかをセットする
-    /// SDK上の色情報を使うならtrue、モデルの色情報を使うならfalse
+    /// 是否用 SDK 的颜色信息覆盖 part 的屏幕色（true 使用 SDK，false 使用模型）。
     /// </summary>
     public bool GetOverwriteColorForPartScreenColors(int partIndex)
     {
@@ -1228,10 +1221,10 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableのカリング情報を取得する。
+    /// 获取 Drawable 的剔除信息。
     /// </summary>
-    /// <param name="drawableIndex">Drawableのインデックス</param>
-    /// <returns>Drawableのカリング情報</returns>
+    /// <param name="drawableIndex">Drawable 的索引</param>
+    /// <returns>Drawable 的剔除信息</returns>
     public unsafe bool GetDrawableCulling(int drawableIndex)
     {
         if (GetOverwriteFlagForModelCullings() || GetOverwriteFlagForDrawableCullings(drawableIndex))
@@ -1244,7 +1237,7 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// Drawableのカリング情報を設定する
+    /// 设置 Drawable 的剔除信息。
     /// </summary>
     public void SetDrawableCulling(int drawableIndex, bool isCulling)
     {
@@ -1252,18 +1245,17 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからモデル全体のカリング設定を上書きするか。
+    /// 是否用 SDK 覆盖整个模型的剔除设置。
     /// </summary>
-    /// <returns>true    ->  SDK上のカリング設定を使用
-    /// false   ->  モデルのカリング設定を使用</returns>
+    /// <returns>true → 使用 SDK 的剔除设置
+    /// false → 使用模型的剔除设置</returns>
     public bool GetOverwriteFlagForModelCullings()
     {
         return _isOverwrittenCullings;
     }
 
     /// <summary>
-    /// SDKからモデル全体のカリング設定を上書きするかをセットする
-    /// SDK上のカリング設定を使うならtrue、モデルのカリング設定を使うならfalse
+    /// 设置是否用 SDK 覆盖整个模型的剔除设置（true 使用 SDK，false 使用模型）。
     /// </summary>
     public void SetOverwriteFlagForModelCullings(bool value)
     {
@@ -1271,18 +1263,17 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// SDKからdrawableのカリング設定を上書きするか。
+    /// 是否用 SDK 覆盖 drawable 的剔除设置。
     /// </summary>
-    /// <returns>true    ->  SDK上のカリング設定を使用
-    /// false   ->  モデルのカリング設定を使用</returns>
+    /// <returns>true → 使用 SDK 的剔除设置
+    /// false → 使用模型的剔除设置</returns>
     public bool GetOverwriteFlagForDrawableCullings(int drawableIndex)
     {
         return _userCullings[drawableIndex].IsOverwritten;
     }
 
     /// <summary>
-    /// SDKからdrawableのカリング設定を上書きするかをセットする
-    /// SDK上のカリング設定を使うならtrue、モデルのカリング設定を使うならfalse
+    /// 设置是否用 SDK 覆盖 drawable 的剔除设置（true 使用 SDK，false 使用模型）。
     /// </summary>
     public void SetOverwriteFlagForDrawableCullings(int drawableIndex, bool value)
     {
@@ -1290,18 +1281,18 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// モデルの不透明度を取得する
+    /// 获取模型的不透明度。
     /// </summary>
-    /// <returns>不透明度の値</returns>
+    /// <returns>不透明度的值</returns>
     public float GetModelOpacity()
     {
         return _modelOpacity;
     }
 
     /// <summary>
-    /// モデルの不透明度を設定する
+    /// 设置模型的不透明度。
     /// </summary>
-    /// <param name="value">不透明度の値</param>
+    /// <param name="value">不透明度的值</param>
     public void SetModelOpacity(float value)
     {
         _modelOpacity = value;
@@ -1325,10 +1316,10 @@ public class CubismModel : IDisposable
     }
 
     /// <summary>
-    /// パラメータのIDを取得する。
+    /// 获取参数的 ID。
     /// </summary>
-    /// <param name="parameterIndex">パラメータのIndex</param>
-    /// <returns>パラメータのID</returns>
+    /// <param name="parameterIndex">参数的索引</param>
+    /// <returns>参数的 ID</returns>
     public unsafe string GetParameterId(int parameterIndex)
     {
         if (0 <= parameterIndex && parameterIndex < ParameterIds.Count)

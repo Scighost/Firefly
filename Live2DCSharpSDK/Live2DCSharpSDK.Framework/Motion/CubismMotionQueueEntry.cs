@@ -1,49 +1,49 @@
 ﻿namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// CubismMotionQueueManagerで再生している各モーションの管理クラス。
+/// CubismMotionQueueManager 中每个动作播放状态的管理类。
 /// </summary>
 public class CubismMotionQueueEntry
 {
     /// <summary>
-    /// モーション
+    /// 动作
     /// </summary>
     public required ACubismMotion Motion { get; set; }
 
     /// <summary>
-    /// 有効化フラグ
+    /// 有效标志
     /// </summary>
     public bool Available { get; set; }
     /// <summary>
-    /// 終了フラグ
+    /// 结束标志
     /// </summary>
     public bool Finished { get; set; }
     /// <summary>
-    /// 開始フラグ（0.9.00以降）
+    /// 开始标志（0.9.00 之后）
     /// </summary>
     public bool Started { get; set; }
     /// <summary>
-    /// モーション再生開始時刻[秒]
+    /// 动作播放开始时刻[秒]
     /// </summary>
     public float StartTime { get; set; }
     /// <summary>
-    /// フェードイン開始時刻（ループの時は初回のみ）[秒]
+    /// 淡入开始时刻（循环时仅首次）[秒]
     /// </summary>
     public float FadeInStartTime { get; set; }
     /// <summary>
-    /// 終了予定時刻[秒]
+    /// 预定结束时刻[秒]
     /// </summary>
     public float EndTime { get; set; }
     /// <summary>
-    /// 時刻の状態[秒]
+    /// 时刻状态[秒]
     /// </summary>
     public float StateTime { get; private set; }
     /// <summary>
-    /// 重みの状態
+    /// 权重状态
     /// </summary>
     public float StateWeight { get; private set; }
     /// <summary>
-    /// 最終のMotion側のチェックした時間
+    /// 动作侧最后一次检查的时间
     /// </summary>
     public float LastEventCheckSeconds { get; set; }
 
@@ -52,7 +52,7 @@ public class CubismMotionQueueEntry
     public bool IsTriggeredFadeOut { get; private set; }
 
     /// <summary>
-    /// コンストラクタ。
+    /// 构造函数。
     /// </summary>
     public CubismMotionQueueEntry()
     {
@@ -62,9 +62,9 @@ public class CubismMotionQueueEntry
     }
 
     /// <summary>
-    /// フェードアウトの開始を設定する。
+    /// 设置淡出开始。
     /// </summary>
-    /// <param name="fadeOutSeconds">フェードアウトにかかる時間[秒]</param>
+    /// <param name="fadeOutSeconds">淡出所需时间[秒]</param>
     public void SetFadeout(float fadeOutSeconds)
     {
         FadeOutSeconds = fadeOutSeconds;
@@ -72,10 +72,10 @@ public class CubismMotionQueueEntry
     }
 
     /// <summary>
-    /// フェードアウトを開始する。
+    /// 开始淡出。
     /// </summary>
-    /// <param name="fadeOutSeconds">フェードアウトにかかる時間[秒]</param>
-    /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
+    /// <param name="fadeOutSeconds">淡出所需时间[秒]</param>
+    /// <param name="userTimeSeconds">居陷时间累计値[秒]</param>
     public void StartFadeout(float fadeOutSeconds, float userTimeSeconds)
     {
         float newEndTimeSeconds = userTimeSeconds + fadeOutSeconds;
@@ -88,10 +88,10 @@ public class CubismMotionQueueEntry
     }
 
     /// <summary>
-    /// モーションの状態を設定する。
+    /// 设置动作状态。
     /// </summary>
-    /// <param name="timeSeconds">現在時刻[秒]</param>
-    /// <param name="weight">モーションの重み</param>
+    /// <param name="timeSeconds">当前时刻[秒]</param>
+    /// <param name="weight">动作的权重</param>
     public void SetState(float timeSeconds, float weight)
     {
         StateTime = timeSeconds;

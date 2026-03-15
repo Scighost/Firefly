@@ -1,30 +1,30 @@
 ﻿namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// 画像情報構造体
+/// 图像信息结构体。
 /// </summary>
 public abstract class TextureInfo
 {
     public int Index;
     /// <summary>
-    /// テクスチャID
+    /// 纹理 ID。
     /// </summary>
     public int Id;
     /// <summary>
-    /// 横幅
+    /// 宽度。
     /// </summary>
     public int Width;
     /// <summary>
-    /// 高さ
+    /// 高度。
     /// </summary>
     public int Height;
     /// <summary>
-    /// ファイル名
+    /// 文件名。
     /// </summary>
     public string FileName;
 
     /// <summary>
-    /// 画像の解放
+    /// 释放图像资源。
     /// </summary>
     public abstract void Dispose();
 };

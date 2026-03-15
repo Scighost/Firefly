@@ -4,34 +4,34 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// モーションの抽象基底クラス。MotionQueueManagerによってモーションの再生を管理する。
+/// 动作的抽象基类，由 MotionQueueManager 管理动作的播放。
 /// </summary>
 public abstract class ACubismMotion
 {
     /// <summary>
-    /// フェードインにかかる時間[秒]
+    /// 淡入所需时间｛秒｝
     /// </summary>
     public float FadeInSeconds { get; set; }
     /// <summary>
-    /// フェードアウトにかかる時間[秒]
+    /// 淡出所需时间｛秒｝
     /// </summary>
     public float FadeOutSeconds { get; set; }
     /// <summary>
-    /// モーションの重み
+    /// 动作的权重
     /// </summary>
     public float Weight { get; set; }
     /// <summary>
-    /// モーション再生の開始時刻[秒]
+    /// 动作播放开始时刻｛秒｝
     /// </summary>
     public float OffsetSeconds { get; set; }
 
     protected readonly List<string> FiredEventValues = [];
 
-    // モーション再生終了コールバック関数
+    // 动作播放结束回调函数
     public FinishedMotionCallback? OnFinishedMotion { get; set; }
 
     /// <summary>
-    /// コンストラクタ。
+    /// 构造函数。
     /// </summary>
     public ACubismMotion()
     {
@@ -41,11 +41,11 @@ public abstract class ACubismMotion
     }
 
     /// <summary>
-    /// モデルのパラメータを更新する。
+    /// 更新模型参数。
     /// </summary>
-    /// <param name="model">対象のモデル</param>
-    /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
-    /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
+    /// <param name="model">目标模型</param>
+    /// <param name="motionQueueEntry">CubismMotionQueueManager 中管理的动作</param>
+    /// <param name="userTimeSeconds">居陷时间的累计値｛秒｝</param>
     public void UpdateParameters(CubismModel model, CubismMotionQueueEntry motionQueueEntry, float userTimeSeconds)
     {
         if (!motionQueueEntry.Available || motionQueueEntry.Finished)
@@ -57,22 +57,22 @@ public abstract class ACubismMotion
 
         var fadeWeight = UpdateFadeWeight(motionQueueEntry, userTimeSeconds);
 
-        //---- 全てのパラメータIDをループする ----
+        //---- 遍历所有参数 ID ----
         DoUpdateParameters(model, userTimeSeconds, fadeWeight, motionQueueEntry);
 
-        //後処理
-        //終了時刻を過ぎたら終了フラグを立てる（CubismMotionQueueManager）
+        //后处理
+        //超过结束时刻时置位结束标志（CubismMotionQueueManager）
         if ((motionQueueEntry.EndTime > 0) && (motionQueueEntry.EndTime < userTimeSeconds))
         {
-            motionQueueEntry.Finished = true;      //終了
+            motionQueueEntry.Finished = true;      //结束
         }
     }
 
     /// <summary>
-    /// モーションの再生を開始するためのセットアップを行う。
+    /// 进行动作播放的初期化设置。
     /// </summary>
-    /// <param name="motionQueueEntry">CubismMotionQueueManagerによって管理されるモーション</param>
-    /// <param name="userTimeSeconds">総再生時間（秒）</param>
+    /// <param name="motionQueueEntry">CubismMotionQueueManager 管理的动作</param>
+    /// <param name="userTimeSeconds">总播放时间（秒）</param>
     public void SetupMotionQueueEntry(CubismMotionQueueEntry motionQueueEntry, float userTimeSeconds)
     {
         if (!motionQueueEntry.Available || motionQueueEntry.Finished)
@@ -86,24 +86,24 @@ public abstract class ACubismMotion
         }
 
         motionQueueEntry.Started = true;
-        motionQueueEntry.StartTime = userTimeSeconds - OffsetSeconds; //モーションの開始時刻を記録
-        motionQueueEntry.FadeInStartTime = userTimeSeconds; //フェードインの開始時刻
+        motionQueueEntry.StartTime = userTimeSeconds - OffsetSeconds; //记录动作的开始时刻
+        motionQueueEntry.FadeInStartTime = userTimeSeconds; //淡入开始时刻
 
         var duration = GetDuration();
 
         if (motionQueueEntry.EndTime < 0)
         {
-            //開始していないうちに終了設定している場合がある。
+            //开始前已设置结束的情况。
             motionQueueEntry.EndTime = (duration <= 0) ? -1 : motionQueueEntry.StartTime + duration;
-            //duration == -1 の場合はループする
+            //duration == -1 时循环播放
         }
     }
 
     /// <summary>
-    /// モーションのウェイトを更新する。
+    /// 更新动作权重。
     /// </summary>
-    /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
-    /// <param name="userTimeSeconds">デルタ時間の積算値[秒]</param>
+    /// <param name="motionQueueEntry">CubismMotionQueueManager 中管理的动作</param>
+    /// <param name="userTimeSeconds">居陷时间的累计値｛秒｝</param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
     public float UpdateFadeWeight(CubismMotionQueueEntry? motionQueueEntry, float userTimeSeconds)
@@ -114,10 +114,10 @@ public abstract class ACubismMotion
             return 0;
         }
 
-        float fadeWeight = Weight; //現在の値と掛け合わせる割合
+        float fadeWeight = Weight; //与当前值相乘的比例
 
-        //---- フェードイン・アウトの処理 ----
-        //単純なサイン関数でイージングする
+        //---- 淡入/淡出处理 ----
+        //使用简单的正弦函数进行缓动
         float fadeIn = FadeInSeconds == 0.0f ? 1.0f
                            : CubismMath.GetEasingSine((userTimeSeconds - motionQueueEntry.FadeInStartTime) / FadeInSeconds);
 
@@ -137,37 +137,37 @@ public abstract class ACubismMotion
     }
 
     /// <summary>
-    /// モーションの長さを取得する。
+    /// 获取动作长度。
     /// 
-    /// ループのときは「-1」。
-    /// ループではない場合は、オーバーライドする。
-    /// 正の値の時は取得される時間で終了する。
-    /// 「-1」のときは外部から停止命令が無い限り終わらない処理となる。
+    /// 循环时返回 "-1"。
+    /// 非循环时请重写此方法。
+    /// 返回正値时在该时间后结束。
+    /// 返回 "-1" 则除非外部发出停止指令，否则永不结束。
     /// </summary>
-    /// <returns>モーションの長さ[秒]</returns>
+    /// <returns>动作长度｛秒｝</returns>
     public virtual float GetDuration()
     {
         return -1.0f;
     }
 
     /// <summary>
-    /// モーションのループ1回分の長さを取得する。
+    /// 获取动作循环一次的长度。
     /// 
-    /// ループしない場合は GetDuration()と同じ値を返す。
-    /// ループ一回分の長さが定義できない場合（プログラム的に動き続けるサブクラスなど）の場合は「-1」を返す
+    /// 不循环时返回与 GetDuration() 相同的値。
+    /// 无法定义循环单次长度时（如程序化连续运动的子类）返回 "-1"。
     /// </summary>
-    /// <returns>モーションのループ1回分の長さ[秒]</returns>
+    /// <returns>动作循环一次的长度｛秒｝</returns>
     public virtual float GetLoopDuration()
     {
         return -1.0f;
     }
 
     /// <summary>
-    /// イベント発火のチェック。
-    /// 入力する時間は呼ばれるモーションタイミングを０とした秒数で行う。
+    /// 检测事件是否触发。
+    /// 输入时间以该动作调用时刻为 0 的秒数进行计算。
     /// </summary>
-    /// <param name="beforeCheckTimeSeconds">前回のイベントチェック時間[秒]</param>
-    /// <param name="motionTimeSeconds">今回の再生時間[秒]</param>
+    /// <param name="beforeCheckTimeSeconds">上一次事件检测时间｛秒｝</param>
+    /// <param name="motionTimeSeconds">本次播放时间｛秒｝</param>
     /// <returns></returns>
     public virtual List<string> GetFiredEvent(float beforeCheckTimeSeconds, float motionTimeSeconds)
     {
@@ -175,28 +175,28 @@ public abstract class ACubismMotion
     }
 
     /// <summary>
-    /// 透明度のカーブが存在するかどうかを確認する
+    /// 检查是否存在不透明度曲线
     /// </summary>
-    /// <returns>true  . キーが存在する
-    /// false . キーが存在しない</returns>
+    /// <returns>true  . 存在键
+    /// false . 不存在键</returns>
     public virtual bool IsExistModelOpacity()
     {
         return false;
     }
 
     /// <summary>
-    /// 透明度のカーブのインデックスを返す
+    /// 返回不透明度曲线的索引
     /// </summary>
-    /// <returns>success：透明度のカーブのインデックス</returns>
+    /// <returns>success：不透明度曲线的索引</returns>
     public virtual int GetModelOpacityIndex()
     {
         return -1;
     }
 
     /// <summary>
-    /// 透明度のIdを返す
+    /// 返回不透明度的 Id
     /// </summary>
-    /// <returns>透明度のId</returns>
+    /// <returns>不透明度的 Id</returns>
     public virtual string? GetModelOpacityId(int index)
     {
         return "";

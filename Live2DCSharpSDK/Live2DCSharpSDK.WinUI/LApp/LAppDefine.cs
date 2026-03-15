@@ -3,12 +3,12 @@
 namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// アプリケーションクラス。
-/// Cubism SDK の管理を行う。
+/// 应用程序类。
+/// 管理 Cubism SDK。
 /// </summary>
 public static class LAppDefine
 {
-    // 画面
+    // 屏幕
     public const float ViewScale = 1.0f;
     public const float ViewMaxScale = 2.0f;
     public const float ViewMinScale = 0.8f;
@@ -23,17 +23,17 @@ public static class LAppDefine
     public const float ViewLogicalMaxBottom = -2.0f;
     public const float ViewLogicalMaxTop = 2.0f;
 
-    // 外部定義ファイル(json)と合わせる
-    public const string MotionGroupIdle = "Idle"; // アイドリング
-    public const string MotionGroupTapBody = "TapBody"; // 体をタップしたとき
+    // 与外部定义文件(json)保持一致
+    public const string MotionGroupIdle = "Idle"; // 待机
+    public const string MotionGroupTapBody = "TapBody"; // 点击身体时
 
-    // 外部定義ファイル(json)と合わせる
+    // 与外部定义文件(json)保持一致
     public const string HitAreaNameHead = "Head";
     public const string HitAreaNameBody = "Body";
 
-    // MOC3の整合性検証オプション
+    // MOC3 一致性校验选项
     public const bool MocConsistencyValidationEnable = true;
 
-    // Frameworkから出力するログのレベル設定
+    // Framework 输出的日志级别设定
     public const LogLevel CubismLoggingLevel = LogLevel.Verbose;
 }

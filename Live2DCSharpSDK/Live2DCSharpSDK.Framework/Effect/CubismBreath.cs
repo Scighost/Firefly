@@ -3,24 +3,24 @@
 namespace Live2DCSharpSDK.Framework.Effect;
 
 /// <summary>
-/// 呼吸機能を提供する。
+/// 提供呼吸功能。
 /// </summary>
 public class CubismBreath
 {
     /// <summary>
-    /// 呼吸にひもづいているパラメータのリスト
+    /// 与呼吸关联的参数列表
     /// </summary>
     public required List<BreathParameterData> Parameters { get; init; }
     /// <summary>
-    /// 積算時間[秒]
+    /// 累计时间[秒]
     /// </summary>
     private float _currentTime;
 
     /// <summary>
-    /// モデルのパラメータを更新する。
+    /// 更新模型的参数。
     /// </summary>
-    /// <param name="model">対象のモデル</param>
-    /// <param name="deltaTimeSeconds">デルタ時間[秒]</param>
+    /// <param name="model">目标模型</param>
+    /// <param name="deltaTimeSeconds">增量时间[秒]</param>
     public void UpdateParameters(CubismModel model, float deltaTimeSeconds)
     {
         _currentTime += deltaTimeSeconds;

@@ -4,26 +4,26 @@ using Live2DCSharpSDK.Framework.Core;
 namespace Live2DCSharpSDK.Framework.Model;
 
 /// <summary>
-/// Mocデータの管理を行うクラス。
+/// 用于管理 Moc 数据的类。
 /// </summary>
 public class CubismMoc : IDisposable
 {
     /// <summary>
-    /// Mocデータ
+    /// Moc 数据
     /// </summary>
     private readonly IntPtr _moc;
     /// <summary>
-    /// 読み込んだモデルの.moc3 Version
+    /// 已读取模型的 .moc3 版本
     /// </summary>
     public uint MocVersion { get; }
 
     public CubismModel Model { get; }
 
     /// <summary>
-    /// バッファからMocファイルを読み取り、Mocデータを作成する。
+    /// 从缓冲区读取 Moc 文件并创建 Moc 数据。
     /// </summary>
-    /// <param name="mocBytes"> Mocファイルのバッファ</param>
-    /// <param name="shouldCheckMocConsistency">MOCの整合性チェックフラグ(初期値 : false)</param>
+    /// <param name="mocBytes">Moc 文件的缓冲区</param>
+    /// <param name="shouldCheckMocConsistency">MOC 的一致性检查标志（默认：false）</param>
     /// <returns></returns>
     public CubismMoc(byte[] mocBytes, bool shouldCheckMocConsistency = false)
     {
@@ -32,13 +32,13 @@ public class CubismMoc : IDisposable
 
         if (shouldCheckMocConsistency)
         {
-            // .moc3の整合性を確認
+            // 检查 .moc3 的一致性
             bool consistency = HasMocConsistency(alignedBuffer, mocBytes.Length);
             if (!consistency)
             {
                 CubismFramework.DeallocateAligned(alignedBuffer);
 
-                // 整合性が確認できなければ処理しない
+                // 如果无法确认一致性则不继续处理
                 throw new Exception("Inconsistent MOC3.");
             }
         }
@@ -68,7 +68,7 @@ public class CubismMoc : IDisposable
     }
 
     /// <summary>
-    /// 最新の.moc3 Versionを取得する。
+    /// 获取最新的 .moc3 版本。
     /// </summary>
     /// <returns></returns>
     public static uint GetLatestMocVersion()
@@ -88,10 +88,9 @@ public class CubismMoc : IDisposable
     }
 
     /// <summary>
-    /// Checks consistency of a moc.
+    /// 检查未复原的 moc 的一致性。
     /// </summary>
-    /// <param name="mocBytes">Mocファイルのバッファ</param>
-    /// <param name="size">バッファのサイズ</param>
+    /// <param name="data">Moc 文件的缓冲区</param>
     /// <returns>'true' if Moc is valid; 'false' otherwise.</returns>
     public static bool HasMocConsistencyFromUnrevivedMoc(byte[] data)
     {
@@ -106,7 +105,7 @@ public class CubismMoc : IDisposable
     }
 
     /// <summary>
-    /// デストラクタ。
+    /// 释放资源。
     /// </summary>
     public void Dispose()
     {

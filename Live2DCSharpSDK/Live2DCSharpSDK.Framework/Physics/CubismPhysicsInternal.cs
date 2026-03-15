@@ -3,37 +3,37 @@
 namespace Live2DCSharpSDK.Framework.Physics;
 
 /// <summary>
-/// 物理演算の適用先の種類。
+/// 物理计算应用目标的类型。
 /// </summary>
 public enum CubismPhysicsTargetType
 {
     /// <summary>
-    /// パラメータに対して適用
+    /// 应用于参数
     /// </summary>
     CubismPhysicsTargetType_Parameter,
 }
 
 /// <summary>
-/// 物理演算の入力の種類。
+/// 物理计算输入的类型。
 /// </summary>
 public enum CubismPhysicsSource
 {
     /// <summary>
-    /// X軸の位置から
+    /// 来自 X 轴位置
     /// </summary>
     CubismPhysicsSource_X,
     /// <summary>
-    /// Y軸の位置から
+    /// 来自 Y 轴位置
     /// </summary>
     CubismPhysicsSource_Y,
     /// <summary>
-    /// 角度から
+    /// 来自角度
     /// </summary>
     CubismPhysicsSource_Angle,
 }
 
 /// <summary>
-/// 物理演算で使用する外部の力。
+/// 物理计算中使用的外力。
 /// </summary>
 public record PhysicsJsonEffectiveForces
 {
@@ -42,60 +42,60 @@ public record PhysicsJsonEffectiveForces
     /// </summary>
     public Vector2 Gravity;
     /// <summary>
-    /// 風
+    /// 风
     /// </summary>
     public Vector2 Wind;
 };
 
 /// <summary>
-/// 物理演算のパラメータ情報。
+/// 物理计算的参数信息。
 /// </summary>
 public record CubismPhysicsParameter
 {
     /// <summary>
-    /// パラメータID
+    /// 参数 ID
     /// </summary>
     public required string Id;
     /// <summary>
-    /// 適用先の種類
+    /// 应用目标的类型
     /// </summary>
     public CubismPhysicsTargetType TargetType;
 };
 
 /// <summary>
-/// 物理演算の正規化情報。
+/// 物理计算的归一化信息。
 /// </summary>
 public record CubismPhysicsNormalization
 {
     /// <summary>
-    /// 最大値
+    /// 最大值
     /// </summary>
     public float Minimum;
     /// <summary>
-    /// 最小値
+    /// 最小值
     /// </summary>
     public float Maximum;
     /// <summary>
-    /// デフォルト値
+    /// 默认值
     /// </summary>
     public float Default;
 }
 
 /// <summary>
-/// 物理演算の演算に使用する物理点の情報。
+/// 物理计算中使用的物理点信息。
 /// </summary>
 public record CubismPhysicsParticle
 {
     /// <summary>
-    /// 初期位置
+    /// 初始位置
     /// </summary>
     public Vector2 InitialPosition;
     /// <summary>
-    /// 動きやすさ
+    /// 可动性
     /// </summary>
     public float Mobility;
     /// <summary>
-    /// 遅れ
+    /// 延迟
     /// </summary>
     public float Delay;
     /// <summary>
@@ -103,83 +103,83 @@ public record CubismPhysicsParticle
     /// </summary>
     public float Acceleration;
     /// <summary>
-    /// 距離
+    /// 距离
     /// </summary>
     public float Radius;
     /// <summary>
-    /// 現在の位置
+    /// 当前位置
     /// </summary>
     public Vector2 Position;
     /// <summary>
-    /// 最後の位置
+    /// 上一次位置
     /// </summary>
     public Vector2 LastPosition;
     /// <summary>
-    /// 最後の重力
+    /// 上一次重力
     /// </summary>
     public Vector2 LastGravity;
     /// <summary>
-    /// 現在かかっている力
+    /// 当前受到的力
     /// </summary>
     public Vector2 Force;
     /// <summary>
-    /// 現在の速度
+    /// 当前速度
     /// </summary>
     public Vector2 Velocity;
 }
 
 /// <summary>
-/// 物理演算の物理点の管理。
+/// 物理计算中物理点的管理。
 /// </summary>
 public record CubismPhysicsSubRig
 {
     /// <summary>
-    /// 入力の個数
+    /// 输入数量
     /// </summary>
     public int InputCount;
     /// <summary>
-    /// 出力の個数
+    /// 输出数量
     /// </summary>
     public int OutputCount;
     /// <summary>
-    /// 物理点の個数
+    /// 物理点数量
     /// </summary>
     public int ParticleCount;
     /// <summary>
-    /// 入力の最初のインデックス
+    /// 输入的起始索引
     /// </summary>
     public int BaseInputIndex;
     /// <summary>
-    /// 出力の最初のインデックス
+    /// 输出的起始索引
     /// </summary>
     public int BaseOutputIndex;
     /// <summary>
-    /// /物理点の最初のインデックス
+    /// 物理点的起始索引
     /// </summary>
     public int BaseParticleIndex;
     /// <summary>
-    /// 正規化された位置
+    /// 归一化后的位置
     /// </summary>
     public required CubismPhysicsNormalization NormalizationPosition;
     /// <summary>
-    /// 正規化された角度
+    /// 归一化后的角度
     /// </summary>
     public required CubismPhysicsNormalization NormalizationAngle;
 }
 
 /// <summary>
-/// 正規化されたパラメータの取得関数の宣言。
+/// 获取归一化参数值的委托声明。
 /// </summary>
-/// <param name="targetTranslation">演算結果の移動値</param>
-/// <param name="targetAngle">演算結果の角度</param>
-/// <param name="value">パラメータの値</param>
-/// <param name="parameterMinimumValue">パラメータの最小値</param>
-/// <param name="parameterMaximumValue">パラメータの最大値</param>
-/// <param name="parameterDefaultValue">パラメータのデフォルト値</param>
-/// <param name="normalizationPosition">正規化された位置</param>
-/// <param name="normalizationAngle">正規化された角度</param>
-/// <param name="isInverted">値が反転されているか？</param>
-/// <param name="weight">重み</param>
+/// <param name="targetTranslation">运算结果的位移值</param>
+/// <param name="targetAngle">运算结果的角度</param>
+/// <param name="value">参数值</param>
+/// <param name="parameterMinimumValue">参数最小值</param>
+/// <param name="parameterMaximumValue">参数最大值</param>
+/// <param name="parameterDefaultValue">参数默认值</param>
+/// <param name="normalizationPosition">归一化后的位置</param>
+/// <param name="normalizationAngle">归一化后的角度</param>
+/// <param name="isInverted">值是否被反转？</param>
+/// <param name="weight">权重</param>
 public delegate void NormalizedPhysicsParameterValueGetter(
     ref Vector2 targetTranslation,
     ref float targetAngle,
@@ -194,14 +194,14 @@ public delegate void NormalizedPhysicsParameterValueGetter(
 );
 
 /// <summary>
-/// 物理演算の値の取得関数の宣言。
+/// 获取物理计算值的委托声明。
 /// </summary>
-/// <param name="translation">移動値</param>
-/// <param name="particles">物理点のリスト</param>
+/// <param name="translation">位移值</param>
+/// <param name="particles">物理点列表</param>
 /// <param name="particleIndex"></param>
-/// <param name="isInverted">値が反転されているか？</param>
+/// <param name="isInverted">值是否被反转？</param>
 /// <param name="parentGravity">重力</param>
-/// <returns>値</returns>
+/// <returns>值</returns>
 public unsafe delegate float PhysicsValueGetter(
     Vector2 translation,
     CubismPhysicsParticle[] particles,
@@ -212,122 +212,122 @@ public unsafe delegate float PhysicsValueGetter(
 );
 
 /// <summary>
-/// 物理演算のスケールの取得関数の宣言。
+/// 获取物理计算缩放值的委托声明。
 /// </summary>
-/// <param name="translationScale">移動値のスケール</param>
-/// <param name="angleScale">角度のスケール</param>
-/// <returns>スケール値</returns>
+/// <param name="translationScale">位移值的缩放比例</param>
+/// <param name="angleScale">角度的缩放比例</param>
+/// <returns>缩放值</returns>
 public unsafe delegate float PhysicsScaleGetter(Vector2 translationScale, float angleScale);
 
 /// <summary>
-/// 物理演算の入力情報。
+/// 物理计算的输入信息。
 /// </summary>
 public record CubismPhysicsInput
 {
     /// <summary>
-    /// 入力元のパラメータ
+    /// 输入来源参数
     /// </summary>
     public required CubismPhysicsParameter Source;
     /// <summary>
-    /// 入力元のパラメータのインデックス
+    /// 输入来源参数的索引
     /// </summary>
     public int SourceParameterIndex;
     /// <summary>
-    /// 重み
+    /// 权重
     /// </summary>
     public float Weight;
     /// <summary>
-    /// 入力の種類
+    /// 输入类型
     /// </summary>
     public CubismPhysicsSource Type;
     /// <summary>
-    /// 値が反転されているかどうか
+    /// 值是否被反转
     /// </summary>
     public bool Reflect;
     /// <summary>
-    /// 正規化されたパラメータ値の取得関数
+    /// 获取归一化参数值的函数
     /// </summary>
     public NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
 }
 
 /// <summary>
-/// 物理演算の出力情報。
+/// 物理计算的输出信息。
 /// </summary>
 public record CubismPhysicsOutput
 {
     /// <summary>
-    /// 出力先のパラメータ
+    /// 输出目标参数
     /// </summary>
     public required CubismPhysicsParameter Destination;
     /// <summary>
-    /// 出力先のパラメータのインデックス
+    /// 输出目标参数的索引
     /// </summary>
     public int DestinationParameterIndex;
     /// <summary>
-    /// 振り子のインデックス
+    /// 钟摆的索引
     /// </summary>
     public int VertexIndex;
     /// <summary>
-    /// 移動値のスケール
+    /// 位移值的缩放比例
     /// </summary>
     public Vector2 TranslationScale;
     /// <summary>
-    /// 角度のスケール
+    /// 角度的缩放比例
     /// </summary>
     public float AngleScale;
     /// <summary>
-    /// 重み
+    /// 权重
     /// </summary>
     public float Weight;
     /// <summary>
-    /// 出力の種類
+    /// 输出类型
     /// </summary>
     public CubismPhysicsSource Type;
     /// <summary>
-    /// 値が反転されているかどうか
+    /// 值是否被反转
     /// </summary>
     public bool Reflect;
     /// <summary>
-    /// 最小値を下回った時の値
+    /// 低于最小值时的值
     /// </summary>
     public float ValueBelowMinimum;
     /// <summary>
-    /// 最大値をこえた時の値
+    /// 超过最大值时的值
     /// </summary>
     public float ValueExceededMaximum;
     /// <summary>
-    /// 物理演算の値の取得関数
+    /// 获取物理计算值的函数
     /// </summary>
     public PhysicsValueGetter GetValue;
     /// <summary>
-    /// 物理演算のスケール値の取得関数
+    /// 获取物理计算缩放值的函数
     /// </summary>
     public PhysicsScaleGetter GetScale;
 }
 
 /// <summary>
-/// 物理演算のデータ。
+/// 物理计算数据。
 /// </summary>
 public record CubismPhysicsRig
 {
     /// <summary>
-    /// 物理演算の物理点の個数
+    /// 物理计算的物理点数量
     /// </summary>
     public int SubRigCount;
     /// <summary>
-    /// 物理演算の物理点の管理のリスト
+    /// 物理计算物理点管理列表
     /// </summary>
     public required CubismPhysicsSubRig[] Settings;
     /// <summary>
-    /// 物理演算の入力のリスト
+    /// 物理计算输入列表
     /// </summary>
     public required CubismPhysicsInput[] Inputs;
     /// <summary>
-    /// 物理演算の出力のリスト
+    /// 物理计算输出列表
     /// </summary>
     public required CubismPhysicsOutput[] Outputs;
     /// <summary>
-    /// 物理演算の物理点のリスト
+    /// 物理计算物理点列表
     /// </summary>
     public required CubismPhysicsParticle[] Particles;
     /// <summary>
@@ -335,11 +335,11 @@ public record CubismPhysicsRig
     /// </summary>
     public Vector2 Gravity;
     /// <summary>
-    /// 風
+    /// 风
     /// </summary>
     public Vector2 Wind;
     /// <summary>
-    /// 物理演算動作FPS
+    /// 物理计算运行 FPS
     /// </summary>
     public float Fps;
 }

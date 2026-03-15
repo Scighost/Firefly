@@ -5,44 +5,44 @@ using System;
 namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// アプリケーションクラス。
-/// Cubism SDK の管理を行う。
+/// 应用程序类。
+/// 管理 Cubism SDK。
 /// </summary>
 public abstract class LAppDelegate : IDisposable
 {
     /// <summary>
-    /// テクスチャマネージャー
+    /// 纹理管理器。
     /// </summary>
     public LAppTextureManager TextureManager { get; private set; }
 
     public LAppLive2DManager Live2dManager { get; private set; }
 
     /// <summary>
-    /// View情報
+    /// View 信息。
     /// </summary>
     public LAppView View { get; protected set; }
 
     public CubismTextureColor BGColor { get; set; } = new(0, 0, 0, 0);
 
     /// <summary>
-    /// クリックしているか
+    /// 是否正在点击。
     /// </summary>
     private bool _captured;
     /// <summary>
-    /// マウスX座標
+    /// 鼠标 X 坐标。
     /// </summary>
     private float _mouseX;
     /// <summary>
-    /// マウスY座標
+    /// 鼠标 Y 坐标。
     /// </summary>
     private float _mouseY;
 
     /// <summary>
-    /// Initialize関数で設定したウィンドウ幅
+    /// Initialize 函数中设置的窗口宽度。
     /// </summary>
     public int WindowWidth { get; protected set; }
     /// <summary>
-    /// Initialize関数で設定したウィンドウ高さ
+    /// Initialize 函数中设置的窗口高度。
     /// </summary>
     public int WindowHeight { get; protected set; }
 
@@ -61,11 +61,11 @@ public abstract class LAppDelegate : IDisposable
     {
         TextureManager = new LAppTextureManager(this);
 
-        // ウィンドウサイズ記憶
+        // 记录窗口尺寸
         GetWindowSize(out int width, out int height);
         WindowWidth = width;
         WindowHeight = height;
-        //AppViewの初期化
+        //初始化 AppView
         View.Initialize();
 
         //load model
@@ -75,7 +75,7 @@ public abstract class LAppDelegate : IDisposable
     }
 
     /// <summary>
-    /// 解放する。
+    /// 释放资源。
     /// </summary>
     public void Dispose()
     {
@@ -87,10 +87,10 @@ public abstract class LAppDelegate : IDisposable
         GetWindowSize(out int width, out int height);
         if ((WindowWidth != width || WindowHeight != height) && width > 0 && height > 0)
         {
-            // サイズを保存しておく
+            // 保存尺寸
             WindowWidth = width;
             WindowHeight = height;
-            //AppViewの初期化
+            //初始化 AppView
             View.Initialize();
         }
     }
@@ -103,13 +103,13 @@ public abstract class LAppDelegate : IDisposable
     public abstract void RunPost();
 
     /// <summary>
-    /// 実行処理。
+    /// 执行处理。
     /// </summary>
     public void Run(float tick)
     {
         Resize();
 
-        // 時間更新
+        // 更新时间
         LAppPal.DeltaTime = tick;
 
         if (RunPre())
@@ -117,17 +117,17 @@ public abstract class LAppDelegate : IDisposable
             return;
         }
 
-        //描画更新
+        //更新绘制
         View.Render();
 
         RunPost();
     }
 
     /// <summary>
-    /// OpenGL用 glfwSetMouseButtonCallback用関数。
+    /// 鼠标按键回调函数（对应 glfwSetMouseButtonCallback）。
     /// </summary>
-    /// <param name="button">ボタン種類</param>
-    /// <param name="action">実行結果</param>
+    /// <param name="button">按键类型</param>
+    /// <param name="action">执行结果</param>
     public void OnMouseCallBack(bool press)
     {
         if (press)
@@ -146,10 +146,10 @@ public abstract class LAppDelegate : IDisposable
     }
 
     /// <summary>
-    /// OpenGL用 glfwSetCursorPosCallback用関数。
+    /// 鼠标移动回调函数（对应 glfwSetCursorPosCallback）。
     /// </summary>
-    /// <param name="x">x座標</param>
-    /// <param name="y">x座標</param>
+    /// <param name="x">x 坐标</param>
+    /// <param name="y">y 坐标</param>
     public void OnMouseCallBack(float x, float y)
     {
         if (!_captured)

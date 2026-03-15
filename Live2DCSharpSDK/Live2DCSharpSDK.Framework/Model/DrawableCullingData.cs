@@ -1,7 +1,7 @@
 ﻿namespace Live2DCSharpSDK.Framework.Model;
 
 /// <summary>
-/// テクスチャのカリング設定を管理するための構造体
+/// 用于管理纹理剪裁（Culling）设置的结构体
 /// </summary>
 public record DrawableCullingData
 {

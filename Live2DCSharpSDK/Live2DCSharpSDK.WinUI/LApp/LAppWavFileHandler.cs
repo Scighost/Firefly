@@ -8,14 +8,14 @@ using Windows.Media.Playback;
 namespace Live2DCSharpSDK.WinUI.LApp;
 
 /// <summary>
-/// WAVファイルの再生とリップシンク用RMS計算を管理するクラス。
-/// CubismSdkForNative の LAppWavFileHandler_Common に相当する。
+/// 管理 WAV 文件播放与口型同步用 RMS 计算的类。
+/// 对应 CubismSdkForNative 的 LAppWavFileHandler_Common。
 /// </summary>
 public sealed class LAppWavFileHandler : IDisposable
 {
     private MediaPlayer? _player;
 
-    // リップシンク用モノラルPCMデータ（-1〜1）
+    // 口型同步用单声道 PCM 数据（-1～1）
     private float[]? _pcmData;
     private int _sampleRate;
     private int _sampleOffset;
@@ -24,14 +24,14 @@ public sealed class LAppWavFileHandler : IDisposable
 
     private CancellationTokenSource? _delayCts;
 
-    /// <summary>最後に計測したRMS値（リップシンク用）</summary>
+    /// <summary>最近一次测量的 RMS 値（口型同步用）</summary>
     public float GetRms() => _lastRms;
 
     /// <summary>
-    /// 毎フレーム呼び出す。RMS値を更新する。
+    /// 每帧调用。更新 RMS 値。
     /// </summary>
-    /// <param name="deltaTimeSeconds">前フレームからの経過秒数</param>
-    /// <returns>更新されていれば true</returns>
+    /// <param name="deltaTimeSeconds">距上帧经过的秒数</param>
+    /// <returns>若有更新则返回 true</returns>
     public bool Update(float deltaTimeSeconds)
     {
         if (_pcmData == null || _sampleOffset >= _pcmData.Length)
@@ -61,13 +61,13 @@ public sealed class LAppWavFileHandler : IDisposable
     }
 
     /// <summary>
-    /// WAVファイルの再生を開始する。
+    /// 开始播放 WAV 文件。
     /// </summary>
-    /// <param name="filePath">WAVファイルのフルパス</param>
-    /// <param name="delayMs">再生開始を遅らせるミリ秒数（SoundDelay）</param>
+    /// <param name="filePath">WAV 文件的完整路径</param>
+    /// <param name="delayMs">延迟播放的毫秒数（SoundDelay）</param>
     public void Start(string filePath, int delayMs = 0)
     {
-        // 前回の遅延タスクをキャンセル
+        // 取消上次的延迟任务
         _delayCts?.Cancel();
         _delayCts?.Dispose();
         _delayCts = null;
@@ -82,7 +82,7 @@ public sealed class LAppWavFileHandler : IDisposable
         if (!File.Exists(filePath))
             return;
 
-        // リップシンク用にPCMを先読みしておく
+        // 预读 PCM 数据供口型同步使用
         LoadWav(filePath);
 
         var cts = new CancellationTokenSource();
@@ -102,7 +102,7 @@ public sealed class LAppWavFileHandler : IDisposable
         });
     }
 
-    /// <summary>再生を停止し状態をリセットする</summary>
+    /// <summary>停止播放并重置状态</summary>
     public void Stop()
     {
         _delayCts?.Cancel();
@@ -128,8 +128,8 @@ public sealed class LAppWavFileHandler : IDisposable
     }
 
     /// <summary>
-    /// WAVファイルを解析してリップシンク用モノラルPCMデータをロードする。
-    /// PCMフォーマット（format tag 1）のみ対応。
+    /// 解析 WAV 文件，加载口型同步用单声道 PCM 数据。
+    /// 仅支持 PCM 格式（format tag 1）。
     /// </summary>
     private bool LoadWav(string filePath)
     {
@@ -138,9 +138,9 @@ public sealed class LAppWavFileHandler : IDisposable
             using var fs = File.OpenRead(filePath);
             using var br = new BinaryReader(fs);
 
-            // "RIFF" シグネチャ
+            // "RIFF" 签名
             if (new string(br.ReadChars(4)) != "RIFF") return false;
-            br.ReadInt32(); // ファイルサイズ - 8（読み飛ばし）
+            br.ReadInt32(); // 文件大小 - 8（跳过）
             if (new string(br.ReadChars(4)) != "WAVE") return false;
 
             int channels = 0, bitsPerSample = 0;
@@ -155,13 +155,13 @@ public sealed class LAppWavFileHandler : IDisposable
                 if (chunkId == "fmt ")
                 {
                     short audioFormat = br.ReadInt16();
-                    if (audioFormat != 1) return false; // リニアPCMのみ対応
+                    if (audioFormat != 1) return false; // 仅支持线性 PCM
                     channels = br.ReadInt16();
                     _sampleRate = br.ReadInt32();
-                    br.ReadInt32(); // 平均データ速度
-                    br.ReadInt16(); // ブロックサイズ
+                    br.ReadInt32(); // 平均数据速率
+                    br.ReadInt16(); // 块大小
                     bitsPerSample = br.ReadInt16();
-                    // fmt チャンクの拡張部分を読み飛ばし
+                    // 跳过 fmt 块的扩展部分
                     fs.Position = chunkEnd;
                 }
                 else if (chunkId == "data")
@@ -173,7 +173,7 @@ public sealed class LAppWavFileHandler : IDisposable
                     int totalSamples = chunkSize / (bytesPerSample * channels);
                     _pcmData = new float[totalSamples];
 
-                    // マルチチャンネルをモノラルにミックスダウン
+                    // 将多声道混音为单声道
                     for (int i = 0; i < totalSamples; i++)
                     {
                         float mixed = 0f;
@@ -185,7 +185,7 @@ public sealed class LAppWavFileHandler : IDisposable
                 }
                 else
                 {
-                    // 奇数サイズのチャンクはパディングバイトあり（RIFF仕様）
+                    // 奇数大小的块有填充字节（RIFF 规范）
                     fs.Position = chunkEnd + (chunkSize & 1);
                 }
             }
@@ -200,7 +200,7 @@ public sealed class LAppWavFileHandler : IDisposable
 
     private static float ReadNormalizedSample(BinaryReader br, int bitsPerSample)
     {
-        // C++版の GetPcmSample に相当
+        // 对应 C++ 版的 GetPcmSample
         switch (bitsPerSample)
         {
             case 8:
@@ -212,7 +212,7 @@ public sealed class LAppWavFileHandler : IDisposable
                     int b0 = br.ReadByte();
                     int b1 = br.ReadByte();
                     int b2 = br.ReadByte();
-                    int s = b0 | (b1 << 8) | ((sbyte)b2 << 16); // 符号付き24bit拡張
+                    int s = b0 | (b1 << 8) | ((sbyte)b2 << 16); // 符号扩展到 24 位有符号整数
                     return s / 8388608f;
                 }
             case 32:

@@ -12,59 +12,59 @@ public abstract class CubismClippingManager
         CubismModel model, int* clippingDrawableIndices, int clipCount);
 
     /// <summary>
-    /// 実験時に1チャンネルの場合は1、RGBだけの場合は3、アルファも含める場合は4
+    /// 实验时单通道为 1，仅 RGB 时为 3，包含 Alpha 时为 4
     /// </summary>
     public const int ColorChannelCount = 4;
     /// <summary>
-    /// 通常のフレームバッファ1枚あたりのマスク最大数
+    /// 普通帧缓冲每张的蒙板最大数量
     /// </summary>
     public const int ClippingMaskMaxCountOnDefault = 36;
     /// <summary>
-    /// フレームバッファが2枚以上ある場合のフレームバッファ1枚あたりのマスク最大数
+    /// 帧缓冲为 2 张及以上时，每张帧缓冲的蒙板最大数量
     /// </summary>
     public const int ClippingMaskMaxCountOnMultiRenderTexture = 32;
 
     /// <summary>
-    /// オフスクリーンサーフェイスのアドレス
+    /// 离屏表面的地址
     /// </summary>
     protected CubismOffscreenSurface CurrentMaskBuffer;
     /// <summary>
-    /// マスクのクリアフラグの配列
+    /// 蒙板清除标志的数组
     /// </summary>
     protected List<bool> ClearedMaskBufferFlags = [];
 
     protected List<CubismTextureColor> ChannelColors = [];
     /// <summary>
-    /// マスク用クリッピングコンテキストのリスト
+    /// 蒙板用裁剪上下文列表
     /// </summary>
     protected List<CubismClippingContext> ClippingContextListForMask = [];
     /// <summary>
-    /// 描画用クリッピングコンテキストのリスト
+    /// 绘制用裁剪上下文列表
     /// </summary>
     public List<CubismClippingContext?> ClippingContextListForDraw { get; init; } = [];
     /// <summary>
-    /// クリッピングマスクのバッファサイズ（初期値:256）
+    /// 裁剪蒙板缓冲大小（初始値：256）
     /// </summary>
     public Vector2 ClippingMaskBufferSize { get; private set; }
     /// <summary>
-    /// 生成するレンダーテクスチャの枚数
+    /// 生成的渲染纹理数量
     /// </summary>
     public int RenderTextureCount { get; private set; }
 
     /// <summary>
-    /// マスク計算用の行列
+    /// 蒙板计算用矩阵
     /// </summary>
     protected CubismMatrix44 TmpMatrix = new();
     /// <summary>
-    /// マスク計算用の行列
+    /// 蒙板计算用矩阵
     /// </summary>
     protected CubismMatrix44 TmpMatrixForMask = new();
     /// <summary>
-    /// マスク計算用の行列
+    /// 蒙板计算用矩阵
     /// </summary>
     protected CubismMatrix44 TmpMatrixForDraw = new();
     /// <summary>
-    /// マスク配置計算用の矩形
+    /// 蒙板布局计算用矩形
     /// </summary>
     protected RectF TmpBoundsOnModel = new();
 
@@ -87,37 +87,36 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// マネージャの初期化処理
-    /// クリッピングマスクを使う描画オブジェクトの登録を行う
+    /// 管理器初始化处理，注册使用裁剪蒙板的绘制对象
     /// </summary>
-    /// <param name="model">モデルのインスタンス</param>
-    /// <param name="maskBufferCount">バッファの生成数</param>
+    /// <param name="model">模型实例</param>
+    /// <param name="maskBufferCount">缓冲生成数量</param>
     public unsafe void Initialize(CubismModel model, int maskBufferCount)
     {
         RenderTextureCount = maskBufferCount;
 
-        // レンダーテクスチャのクリアフラグの設定
+        // 设置渲染纹理的清除标志
         for (int i = 0; i < RenderTextureCount; ++i)
         {
             ClearedMaskBufferFlags.Add(false);
         }
 
-        //クリッピングマスクを使う描画オブジェクトを全て登録する
-        //クリッピングマスクは、通常数個程度に限定して使うものとする
+        //注册所有使用裁剪蒙板的绘制对象
+        //裁剪蒙板通常限制在几个左右使用
         for (int i = 0; i < model.GetDrawableCount(); i++)
         {
             if (model.GetDrawableMaskCounts()[i] <= 0)
             {
-                //クリッピングマスクが使用されていないアートメッシュ（多くの場合使用しない）
+                //未使用裁剪蒙板的绘制网格（大多数情况不使用）
                 ClippingContextListForDraw.Add(null);
                 continue;
             }
 
-            // 既にあるClipContextと同じかチェックする
+            // 检查是否与已有的 ClipContext 相同
             var cc = FindSameClip(model.GetDrawableMasks()[i], model.GetDrawableMaskCounts()[i]);
             if (cc == null)
             {
-                // 同一のマスクが存在していない場合は生成する
+                // 若不存在相同的蒙板则生成
                 cc = CreateClippingContext(this, model, model.GetDrawableMasks()[i], model.GetDrawableMaskCounts()[i]);
                 ClippingContextListForMask.Add(cc);
             }
@@ -129,24 +128,24 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// 既にマスクを作っているかを確認。
-    /// 作っているようであれば該当するクリッピングマスクのインスタンスを返す。
-    /// 作っていなければNULLを返す
+    /// 确认是否已创建蒙板。
+    /// 如已创建，则返回对应裁剪蒙板的实例。
+    /// 未创建则返回 NULL
     /// </summary>
-    /// <param name="drawableMasks">描画オブジェクトをマスクする描画オブジェクトのリスト</param>
-    /// <param name="drawableMaskCounts">描画オブジェクトをマスクする描画オブジェクトの数</param>
-    /// <returns>該当するクリッピングマスクが存在すればインスタンスを返し、なければNULLを返す。</returns>
+    /// <param name="drawableMasks">对绘制对象进行蒙板的绘制对象列表</param>
+    /// <param name="drawableMaskCounts">对绘制对象进行蒙板的绘制对象数量</param>
+    /// <returns>若存在对应裁剪蒙板则返回实例，否则返回 NULL。</returns>
     private unsafe CubismClippingContext? FindSameClip(int* drawableMasks, int drawableMaskCounts)
     {
-        // 作成済みClippingContextと一致するか確認
+        // 确认是否与已创建的 ClippingContext 一致
         for (int i = 0; i < ClippingContextListForMask.Count; i++)
         {
             var cc = ClippingContextListForMask[i];
             int count = cc.ClippingIdCount;
-            if (count != drawableMaskCounts) continue; //個数が違う場合は別物
+            if (count != drawableMaskCounts) continue; //数量不同则为不同对象
             int samecount = 0;
 
-            // 同じIDを持つか確認。配列の数が同じなので、一致した個数が同じなら同じ物を持つとする。
+            // 确认是否持有相同 ID。由于数组数量相同，若匹配数量一致则视为持有相同内容。
             for (int j = 0; j < count; j++)
             {
                 int clipId = cc.ClippingIdList[j];
@@ -164,30 +163,30 @@ public abstract class CubismClippingManager
                 return cc;
             }
         }
-        return null; //見つからなかった
+        return null; //未找到
     }
 
     /// <summary>
-    /// 高精細マスク処理用の行列を計算する
+    /// 计算高精度蒙板处理用矩阵
     /// </summary>
-    /// <param name="model">モデルのインスタンス</param>
-    /// <param name="isRightHanded">処理が右手系であるか</param>
+    /// <param name="model">模型实例</param>
+    /// <param name="isRightHanded">处理是否为右手坐标系</param>
     public void SetupMatrixForHighPrecision(CubismModel model, bool isRightHanded)
     {
-        // 全てのクリッピングを用意する
-        // 同じクリップ（複数の場合はまとめて１つのクリップ）を使う場合は１度だけ設定する
+        // 准备所有裁剪
+        // 使用相同裁剪（多个情况合并为一个）时只设置一次
         int usingClipCount = 0;
         for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
-            // １つのクリッピングマスクに関して
+            // 关于一个裁剪蒙板
             var cc = ClippingContextListForMask[clipIndex];
 
-            // このクリップを利用する描画オブジェクト群全体を囲む矩形を計算
+            // 计算包围所有使用此裁剪的绘制对象的矩形
             CalcClippedDrawTotalBounds(model, cc);
 
             if (cc.IsUsing)
             {
-                usingClipCount++; //使用中としてカウント
+                usingClipCount++; //计为使用中
             }
         }
 
@@ -195,10 +194,10 @@ public abstract class CubismClippingManager
         {
             return;
         }
-        // マスク行列作成処理
+        // 蒙板矩阵创建处理
         SetupLayoutBounds(0);
 
-        // サイズがレンダーテクスチャの枚数と合わない場合は合わせる
+        // 若大小与渲染纹理数量不匹配则进行调整
         if (ClearedMaskBufferFlags.Count != RenderTextureCount)
         {
             ClearedMaskBufferFlags.Clear();
@@ -210,21 +209,21 @@ public abstract class CubismClippingManager
         }
         else
         {
-            // マスクのクリアフラグを毎フレーム開始時に初期化
+            // 每帧开始时初始化蒙板的清除标志
             for (int i = 0; i < RenderTextureCount; ++i)
             {
                 ClearedMaskBufferFlags[i] = false;
             }
         }
 
-        // 実際にマスクを生成する
-        // 全てのマスクをどの様にレイアウトして描くかを決定し、ClipContext , ClippedDrawContext に記憶する
+        // 实际生成蒙板
+        // 决定所有蒙板的布局方式，并记录到 ClipContext 和 ClippedDrawContext 中
         for (int clipIndex = 0; clipIndex < ClippingContextListForMask.Count; clipIndex++)
         {
-            // --- 実際に１つのマスクを描く ---
+            // --- 实际绘制一个蒙板 ---
             var clipContext = ClippingContextListForMask[clipIndex];
-            var allClippedDrawRect = clipContext.AllClippedDrawRect; //このマスクを使う、全ての描画オブジェクトの論理座標上の囲み矩形
-            var layoutBoundsOnTex01 = clipContext.LayoutBounds; //この中にマスクを収める
+            var allClippedDrawRect = clipContext.AllClippedDrawRect; //使用此蒙板的所有绘制对象在逻辑坐标上的包围矩形
+            var layoutBoundsOnTex01 = clipContext.LayoutBounds; //将蒙板容纳于此区域中
             float MARGIN = 0.05f;
             float scaleX;
             float scaleY;
@@ -256,7 +255,7 @@ public abstract class CubismClippingManager
             }
 
 
-            // マスク生成時に使う行列を求める
+            // 计算生成蒙板时使用的矩阵
             CreateMatrixForMask(isRightHanded, layoutBoundsOnTex01, scaleX, scaleY);
 
             clipContext.MatrixForMask.SetMatrix(TmpMatrixForMask.Tr);
@@ -265,17 +264,17 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// マスク作成・描画用の行列を作成する。
+    /// 创建蒙板制作/绘制用矩阵。
     /// </summary>
-    /// <param name="isRightHanded">座標を右手系として扱うかを指定</param>
-    /// <param name="layoutBoundsOnTex01">マスクを収める領域</param>
-    /// <param name="scaleX">描画オブジェクトの伸縮率</param>
-    /// <param name="scaleY">描画オブジェクトの伸縮率</param>
+    /// <param name="isRightHanded">指定是否将坐标视为右手系</param>
+    /// <param name="layoutBoundsOnTex01">容纳蒙板的区域</param>
+    /// <param name="scaleX">绘制对象的缩放比例</param>
+    /// <param name="scaleY">绘制对象的缩放比例</param>
     protected void CreateMatrixForMask(bool isRightHanded, RectF layoutBoundsOnTex01, float scaleX, float scaleY)
     {
         TmpMatrix.LoadIdentity();
         {
-            // Layout0..1 を -1..1に変換
+            // 将 Layout 0..1 转换为 -1..1
             TmpMatrix.TranslateRelative(-1.0f, -1.0f);
             TmpMatrix.ScaleRelative(2.0f, 2.0f);
         }
@@ -285,7 +284,7 @@ public abstract class CubismClippingManager
             TmpMatrix.ScaleRelative(scaleX, scaleY); //new = [translate][scale]
             TmpMatrix.TranslateRelative(-TmpBoundsOnModel.X, -TmpBoundsOnModel.Y); //new = [translate][scale][translate]
         }
-        // tmpMatrixForMask が計算結果
+        // tmpMatrixForMask 为计算结果
         TmpMatrixForMask.SetMatrix(TmpMatrix.Tr);
 
         TmpMatrix.LoadIdentity();
@@ -299,11 +298,11 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// クリッピングコンテキストを配置するレイアウト。
-    /// ひとつのレンダーテクスチャを極力いっぱいに使ってマスクをレイアウトする。
-    /// マスクグループの数が4以下ならRGBA各チャンネルに１つずつマスクを配置し、5以上6以下ならRGBAを2,2,1,1と配置する。
+    /// 配置裁剪上下文的布局。
+    /// 尽可能充分利用一张渲染纹理来布局蒙板。
+    /// 蒙板组数量 ≤4 时，在 RGBA 各通道各放置 1 个；5~6 个时，以 2,2,1,1 分配到 RGBA。
     /// </summary>
-    /// <param name="usingClipCount">配置するクリッピングコンテキストの数</param>
+    /// <param name="usingClipCount">要配置的裁剪上下文数量</param>
     protected void SetupLayoutBounds(int usingClipCount)
     {
         int useClippingMaskMaxCount = RenderTextureCount <= 1
@@ -314,17 +313,17 @@ public abstract class CubismClippingManager
         {
             if (usingClipCount > useClippingMaskMaxCount)
             {
-                // マスクの制限数の警告を出す
+                // 输出蒙板数量限制警告
                 int count = usingClipCount - useClippingMaskMaxCount;
                 CubismLog.Error("[Live2D SDK]not supported mask count : %d\n[Details] render texture count: %d\n, mask count : %d"
                     , count, RenderTextureCount, usingClipCount);
             }
 
-            // この場合は一つのマスクターゲットを毎回クリアして使用する
+            // 此情况下每次清空一个蒙板目标再使用
             for (int index = 0; index < ClippingContextListForMask.Count; index++)
             {
                 CubismClippingContext cc = ClippingContextListForMask[index];
-                cc.LayoutChannelIndex = 0; // どうせ毎回消すので固定で良い
+                cc.LayoutChannelIndex = 0; // 每次都会清除，固定使用即可
                 cc.LayoutBounds.X = 0.0f;
                 cc.LayoutBounds.Y = 0.0f;
                 cc.LayoutBounds.Width = 1.0f;
@@ -334,48 +333,48 @@ public abstract class CubismClippingManager
             return;
         }
 
-        // レンダーテクスチャが1枚なら9分割する（最大36枚）
+        // 渲染纹理为 1 张时进行 9 分割（最多 36 张）
         int layoutCountMaxValue = RenderTextureCount <= 1 ? 9 : 8;
 
-        // ひとつのRenderTextureを極力いっぱいに使ってマスクをレイアウトする
-        // マスクグループの数が4以下ならRGBA各チャンネルに１つずつマスクを配置し、5以上6以下ならRGBAを2,2,1,1と配置する
-        int countPerSheetDiv = (usingClipCount + RenderTextureCount - 1) / RenderTextureCount; // レンダーテクスチャ1枚あたり何枚割り当てるか（切り上げ）
-        int reduceLayoutTextureCount = usingClipCount % RenderTextureCount; // レイアウトの数を1枚減らすレンダーテクスチャの数（この数だけのレンダーテクスチャが対象）
+        // 尽可能充分利用一张 RenderTexture 来布局蒙板
+        // 蒙板组数量 ≤4 时，在 RGBA 各通道各放置 1 个，5~6 个时以 2,2,1,1 分配
+        int countPerSheetDiv = (usingClipCount + RenderTextureCount - 1) / RenderTextureCount; // 每张渲染纹理分配几张（向上取整）
+        int reduceLayoutTextureCount = usingClipCount % RenderTextureCount; // 减少1 张布局的渲染纹理数量（此数量的渲染纹理为目标）
 
-        // RGBAを順番に使っていく
-        int divCount = countPerSheetDiv / ColorChannelCount; //１チャンネルに配置する基本のマスク個数
-        int modCount = countPerSheetDiv % ColorChannelCount; //余り、この番号のチャンネルまでに１つずつ配分する
+        // 按顺序使用 RGBA
+        int divCount = countPerSheetDiv / ColorChannelCount; //每个通道配置的基本蒙板数量
+        int modCount = countPerSheetDiv % ColorChannelCount; //余数，在此编号的通道之前各分配一个
 
-        // RGBAそれぞれのチャンネルを用意していく(0:R , 1:G , 2:B, 3:A, )
-        int curClipIndex = 0; //順番に設定していく
+        // 依次准备 RGBA 各通道 (0:R , 1:G , 2:B, 3:A, )
+        int curClipIndex = 0; //按顺序设置
 
         for (int renderTextureIndex = 0; renderTextureIndex < RenderTextureCount; renderTextureIndex++)
         {
             for (int channelIndex = 0; channelIndex < ColorChannelCount; channelIndex++)
             {
-                // このチャンネルにレイアウトする数
-                // NOTE: レイアウト数 = 1チャンネルに配置する基本のマスク + 余りのマスクを置くチャンネルなら1つ追加
+                // 在此通道中布局的数量
+                // NOTE: 布局数量 = 每通道基本蒙板数 + 若为放置余数的通道则追加 1 个
                 int layoutCount = divCount + (channelIndex < modCount ? 1 : 0);
 
-                // レイアウトの数を1枚減らす場合にそれを行うチャンネルを決定
-                // divが0の時は正常なインデックスの範囲内になるように調整
+                // 决定需要减少 1 张布局时的目标通道
+                // div 为 0 时调整为正常索引范围内
                 int checkChannelIndex = modCount + (divCount < 1 ? -1 : 0);
 
-                // 今回が対象のチャンネルかつ、レイアウトの数を1枚減らすレンダーテクスチャが存在する場合
+                // 当前通道为目标通道，且存在需减少布局数量的渲染纹理时
                 if (channelIndex == checkChannelIndex && reduceLayoutTextureCount > 0)
                 {
-                    // 現在のレンダーテクスチャが、対象のレンダーテクスチャであればレイアウトの数を1枚減らす
+                    // 若当前渲染纹理为目标渲染纹理，则将布局数量减 1
                     layoutCount -= !(renderTextureIndex < reduceLayoutTextureCount) ? 1 : 0;
                 }
 
-                // 分割方法を決定する
+                // 决定分割方式
                 if (layoutCount == 0)
                 {
-                    // 何もしない
+                    // 不做任何操作
                 }
                 else if (layoutCount == 1)
                 {
-                    //全てをそのまま使う
+                    //全部直接使用
                     var cc = ClippingContextListForMask[curClipIndex++];
                     cc.LayoutChannelIndex = channelIndex;
                     cc.LayoutBounds.X = 0.0f;
@@ -398,12 +397,12 @@ public abstract class CubismClippingManager
                         cc.LayoutBounds.Width = 0.5f;
                         cc.LayoutBounds.Height = 1.0f;
                         cc.BufferIndex = renderTextureIndex;
-                        //UVを2つに分解して使う
+                        //将 UV 分解为 2 部分使用
                     }
                 }
                 else if (layoutCount <= 4)
                 {
-                    //4分割して使う
+                    //分为 4 份使用
                     for (int i = 0; i < layoutCount; i++)
                     {
                         int xpos = i % 2;
@@ -421,7 +420,7 @@ public abstract class CubismClippingManager
                 }
                 else if (layoutCount <= layoutCountMaxValue)
                 {
-                    //9分割して使う
+                    //分为 9 份使用
                     for (int i = 0; i < layoutCount; i++)
                     {
                         int xpos = i % 3;
@@ -437,12 +436,12 @@ public abstract class CubismClippingManager
                         cc.BufferIndex = renderTextureIndex;
                     }
                 }
-                // マスクの制限枚数を超えた場合の処理
+                // 超过蒙板限制数量时的处理
                 else
                 {
                     int count = usingClipCount - useClippingMaskMaxCount;
 
-                    // 開発モードの場合は停止させる
+                    // 开发模式下停止运行
                     throw new Exception($"not supported mask count : {count}\n[Details] render texture count: {RenderTextureCount}\n, mask count : {usingClipCount}");
                 }
             }
@@ -450,23 +449,23 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// マスクされる描画オブジェクト群全体を囲む矩形(モデル座標系)を計算する
+    /// 计算所有被蒙板裁剪的绘制对象的包围矩形（模型坐标系）
     /// </summary>
-    /// <param name="model">モデルのインスタンス</param>
-    /// <param name="clippingContext">クリッピングマスクのコンテキスト</param>
+    /// <param name="model">模型实例</param>
+    /// <param name="clippingContext">裁剪蒙板的上下文</param>
     protected unsafe void CalcClippedDrawTotalBounds(CubismModel model, CubismClippingContext clippingContext)
     {
-        // 被クリッピングマスク（マスクされる描画オブジェクト）の全体の矩形
+        // 所有被裁剪蒙板覆盖的绘制对象的整体矩形
         float clippedDrawTotalMinX = float.MaxValue, clippedDrawTotalMinY = float.MaxValue;
         float clippedDrawTotalMaxX = float.MinValue, clippedDrawTotalMaxY = float.MinValue;
 
-        // このマスクが実際に必要か判定する
-        // このクリッピングを利用する「描画オブジェクト」がひとつでも使用可能であればマスクを生成する必要がある
+        // 判断该蒙板是否实际需要
+        // 只要有一个使用此裁剪的“绘制对象”可用，就需要生成蒙板
 
         int clippedDrawCount = clippingContext.ClippedDrawableIndexList.Count;
         for (int clippedDrawableIndex = 0; clippedDrawableIndex < clippedDrawCount; clippedDrawableIndex++)
         {
-            // マスクを使用する描画オブジェクトの描画される矩形を求める
+            // 求使用蒙板的绘制对象的绘制矩形
             int drawableIndex = clippingContext.ClippedDrawableIndexList[clippedDrawableIndex];
 
             int drawableVertexCount = model.GetDrawableVertexCount(drawableIndex);
@@ -487,9 +486,9 @@ public abstract class CubismClippingManager
             }
 
             //
-            if (minX == float.MaxValue) continue; //有効な点がひとつも取れなかったのでスキップする
+            if (minX == float.MaxValue) continue; //未获取到有效点，跳过
 
-            // 全体の矩形に反映
+            // 反映到整体矩形
             if (minX < clippedDrawTotalMinX) clippedDrawTotalMinX = minX;
             if (minY < clippedDrawTotalMinY) clippedDrawTotalMinY = minY;
             if (maxX > clippedDrawTotalMaxX) clippedDrawTotalMaxX = maxX;
@@ -516,9 +515,9 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// カラーチャンネル(RGBA)のフラグを取得する
+    /// 获取颜色通道（RGBA）的标志
     /// </summary>
-    /// <param name="channelNo">カラーチャンネル(RGBA)の番号(0:R , 1:G , 2:B, 3:A)</param>
+    /// <param name="channelNo">颜色通道（RGBA）的编号 (0:R , 1:G , 2:B, 3:A)</param>
     /// <returns></returns>
     public CubismTextureColor GetChannelFlagAsColor(int channelNo)
     {
@@ -526,10 +525,10 @@ public abstract class CubismClippingManager
     }
 
     /// <summary>
-    /// クリッピングマスクバッファのサイズを設定する
+    /// 设置裁剪蒙板缓冲的大小
     /// </summary>
-    /// <param name="width">クリッピングマスクバッファのサイズ</param>
-    /// <param name="height">クリッピングマスクバッファのサイズ</param>
+    /// <param name="width">裁剪蒙板缓冲的宽度</param>
+    /// <param name="height">裁剪蒙板缓冲的高度</param>
     public void SetClippingMaskBufferSize(float width, float height)
     {
         ClippingMaskBufferSize = new Vector2(width, height);

@@ -1,7 +1,7 @@
 ﻿namespace Live2DCSharpSDK.Framework.Physics;
 
 /// <summary>
-/// physics3.jsonのコンテナ。
+/// physics3.json 的容器。
 /// </summary>
 public record CubismPhysicsJson
 {

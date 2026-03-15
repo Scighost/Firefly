@@ -5,7 +5,7 @@ using Live2DCSharpSDK.Framework.Model;
 namespace Live2DCSharpSDK.Framework.Motion;
 
 /// <summary>
-/// モーションのクラス。
+/// 动作类。
 /// </summary>
 public class CubismMotion : ACubismMotion
 {
@@ -19,60 +19,60 @@ public class CubismMotion : ACubismMotion
     public const string IdNameOpacity = "Opacity";
 
     /// <summary>
-    /// ロードしたファイルのFPS。記述が無ければデフォルト値15fpsとなる
+    /// 已加载文件的 FPS，没有符号就使用默认値 15fps
     /// </summary>
     private readonly float _sourceFrameRate;
     /// <summary>
-    /// mtnファイルで定義される一連のモーションの長さ
+    /// mtn 文件中定义的动作总长度
     /// </summary>
     private readonly float _loopDurationSeconds;
     /// <summary>
-    /// ループするか?
+    /// 是否循环?
     /// </summary>
     public bool IsLoop { get; set; }
     /// <summary>
-    /// ループ時にフェードインが有効かどうかのフラグ。初期値では有効。
+    /// 循环时淡入是否有效的标志，默认居有效。
     /// </summary>
     public bool IsLoopFadeIn { get; set; }
     /// <summary>
-    /// 最後に設定された重み
+    /// 最后设置的权重
     /// </summary>
     private float _lastWeight;
 
     /// <summary>
-    /// 実際のモーションデータ本体
+    /// 实际持有的动作数据本体
     /// </summary>
     private readonly CubismMotionData _motionData;
 
     /// <summary>
-    /// 自動まばたきを適用するパラメータIDハンドルのリスト。  モデル（モデルセッティング）とパラメータを対応付ける。
+    /// 应用自动眼驱的参数 ID 列表。将模型（模型设置）与参数对应。
     /// </summary>
     private List<string> _eyeBlinkParameterIds;
     /// <summary>
-    /// リップシンクを適用するパラメータIDハンドルのリスト。  モデル（モデルセッティング）とパラメータを対応付ける。
+    /// 应用口型同步的参数 ID 列表。将模型（模型设置）与参数对应。
     /// </summary>
     private List<string> _lipSyncParameterIds;
 
     /// <summary>
-    /// モデルが持つ自動まばたき用パラメータIDのハンドル。  モデルとモーションを対応付ける。
+    /// 模型中自动眼驱参数 ID 的句柄。将模型与动作对应。
     /// </summary>
     private string _modelCurveIdEyeBlink;
     /// <summary>
-    /// モデルが持つリップシンク用パラメータIDのハンドル。  モデルとモーションを対応付ける。
+    /// 模型中口型同步参数 ID 的句柄。将模型与动作对应。
     /// </summary>
     private string _modelCurveIdLipSync;
     /// <summary>
-    /// モデルが持つ不透明度用パラメータIDのハンドル。  モデルとモーションを対応付ける。
+    /// 模型中不透明度参数 ID 的句柄。将模型与动作对应。
     /// </summary>
     private string _modelCurveIdOpacity;
 
     /// <summary>
-    /// モーションから取得した不透明度
+    /// 从动作中获取的不透明度
     /// </summary>
     private float _modelOpacity;
 
     /**
-    * Cubism SDK R2 以前のモーションを再現させるなら true 、アニメータのモーションを正しく再現するなら false 。
+    * 若要复现 Cubism SDK R2 之前的动作则设为 true，若要正确复现动画制作者的动作则设为 false。
     */
     private readonly bool UseOldBeziersCurveMotion = false;
 
@@ -269,15 +269,15 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// インスタンスを作成する。
+    /// 创建实例。
     /// </summary>
-    /// <param name="buffer">motion3.jsonが読み込まれているバッファ</param>
-    /// <param name="onFinishedMotionHandler">モーション再生終了時に呼び出されるコールバック関数。NULLの場合、呼び出されない。</param>
+    /// <param name="buffer">已加载 motion3.json 的缓冲区</param>
+    /// <param name="onFinishedMotionHandler">动作播放结束时调用的回调函数，为 NULL 时不调用。</param>
     public CubismMotion(string buffer, FinishedMotionCallback? onFinishedMotionHandler = null)
     {
         _sourceFrameRate = 30.0f;
         _loopDurationSeconds = -1.0f;
-        IsLoopFadeIn = true;       // ループ時にフェードインが有効かどうかのフラグ
+        IsLoopFadeIn = true;       // 循环时淡入是否有效的标志
         _modelOpacity = 1.0f;
 
         using var stream = File.Open(buffer, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -480,12 +480,12 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// モデルのパラメータ更新を実行する。
+    /// 执行模型参数更新。
     /// </summary>
-    /// <param name="model">対象のモデル</param>
-    /// <param name="userTimeSeconds">現在の時刻[秒]</param>
-    /// <param name="fadeWeight">モーションの重み</param>
-    /// <param name="motionQueueEntry">CubismMotionQueueManagerで管理されているモーション</param>
+    /// <param name="model">目标模型</param>
+    /// <param name="userTimeSeconds">当前时刻[秒]</param>
+    /// <param name="fadeWeight">动作权重</param>
+    /// <param name="motionQueueEntry">CubismMotionQueueManager 中管理的动作</param>
     public override void DoUpdateParameters(CubismModel model, float userTimeSeconds, float fadeWeight, CubismMotionQueueEntry motionQueueEntry)
     {
         _modelCurveIdEyeBlink ??= CubismFramework.CubismIdManager.GetId(EffectNameEyeBlink);
@@ -498,18 +498,18 @@ public class CubismMotion : ACubismMotion
 
         if (timeOffsetSeconds < 0.0f)
         {
-            timeOffsetSeconds = 0.0f; // エラー回避
+            timeOffsetSeconds = 0.0f; // 防止错误
         }
 
         float lipSyncValue = float.MaxValue;
         float eyeBlinkValue = float.MaxValue;
 
-        //まばたき、リップシンクのうちモーションの適用を検出するためのビット（maxFlagCount個まで
+        //眼驱、口型同步中检测动作是否应用的标志位（最多 MaxFlagCount 个）
         int MaxTargetSize = 64;
         ulong lipSyncFlags = 0;
         ulong eyeBlinkFlags = 0;
 
-        //瞬き、リップシンクのターゲット数が上限を超えている場合
+        //眼驱、口型同步目标数超过上限时
         if (_eyeBlinkParameterIds.Count > MaxTargetSize)
         {
             CubismLog.Warning($"[Live2D SDK]too many eye blink targets : {_eyeBlinkParameterIds.Count}");
@@ -559,7 +559,7 @@ public class CubismMotion : ACubismMotion
             {
                 _modelOpacity = value;
 
-                // ------ 不透明度の値が存在すれば反映する ------
+                // ------ 如果存在不透明度倗就应用 ------
                 model.SetModelOpacity(GetModelOpacityValue());
             }
         }
@@ -611,15 +611,15 @@ public class CubismMotion : ACubismMotion
             }
 
             float v;
-            // パラメータごとのフェード
+            // 每个参数的淡入淡出
             if (curves[c].FadeInTime < 0.0f && curves[c].FadeOutTime < 0.0f)
             {
-                //モーションのフェードを適用
+                //应用动作整体的淡入淡出
                 v = sourceValue + (value - sourceValue) * fadeWeight;
             }
             else
             {
-                // パラメータに対してフェードインかフェードアウトが設定してある場合はそちらを適用
+                // 如果参数单独设置了淡入或淡出，则应用该设置
                 float fin;
                 float fout;
 
@@ -646,7 +646,7 @@ public class CubismMotion : ACubismMotion
 
                 float paramWeight = Weight * fin * fout;
 
-                // パラメータごとのフェードを適用
+                // 应用每个参数的淡入淡出
                 v = sourceValue + (value - sourceValue) * paramWeight;
             }
 
@@ -658,7 +658,7 @@ public class CubismMotion : ACubismMotion
             for (int i = 0; i < _eyeBlinkParameterIds.Count && i < MaxTargetSize; ++i)
             {
                 float sourceValue = model.GetParameterValue(_eyeBlinkParameterIds[i]);
-                //モーションでの上書きがあった時にはまばたきは適用しない
+                //动作覆盖时不应用眼驱
                 if (((eyeBlinkFlags >> i) & 0x01) != 0UL)
                 {
                     continue;
@@ -675,7 +675,7 @@ public class CubismMotion : ACubismMotion
             for (int i = 0; i < _lipSyncParameterIds.Count && i < MaxTargetSize; ++i)
             {
                 float sourceValue = model.GetParameterValue(_lipSyncParameterIds[i]);
-                //モーションでの上書きがあった時にはリップシンクは適用しない
+                //动作覆盖时不应用口型同步
                 if (((lipSyncFlags >> i) & 0x01) != 0UL)
                 {
                     continue;
@@ -708,10 +708,10 @@ public class CubismMotion : ACubismMotion
         {
             if (IsLoop)
             {
-                motionQueueEntry.StartTime = userTimeSeconds; //最初の状態へ
+                motionQueueEntry.StartTime = userTimeSeconds; //回到初始状态
                 if (IsLoopFadeIn)
                 {
-                    //ループ中でループ用フェードインが有効のときは、フェードイン設定し直し
+                    //循环中且循环淡入有效时，重新设置淡入
                     motionQueueEntry.FadeInStartTime = userTimeSeconds;
                 }
             }
@@ -727,28 +727,28 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// モーションの長さを取得する。
+    /// 获取动作长度。
     /// </summary>
-    /// <returns>モーションの長さ[秒]</returns>
+    /// <returns>动作长度[秒]</returns>
     public override float GetDuration()
     {
         return IsLoop ? -1.0f : _loopDurationSeconds;
     }
 
     /// <summary>
-    /// モーションのループ時の長さを取得する。
+    /// 获取动作循环时的长度。
     /// </summary>
-    /// <returns>モーションのループ時の長さ[秒]</returns>
+    /// <returns>动作循环时的长度[秒]</returns>
     public override float GetLoopDuration()
     {
         return _loopDurationSeconds;
     }
 
     /// <summary>
-    /// パラメータに対するフェードインの時間を設定する。
+    /// 设置指定参数的淡入时间。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <param name="value">フェードインにかかる時間[秒]</param>
+    /// <param name="parameterId">参数 ID</param>
+    /// <param name="value">淡入所需时间[秒]</param>
     public void SetParameterFadeInTime(string parameterId, float value)
     {
         var curves = _motionData.Curves;
@@ -764,10 +764,10 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// パラメータに対するフェードアウトの時間を設定する。
+    /// 设置指定参数的淡出时间。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <param name="value">フェードアウトにかかる時間[秒]</param>
+    /// <param name="parameterId">参数 ID</param>
+    /// <param name="value">淡出所需时间[秒]</param>
     public void SetParameterFadeOutTime(string parameterId, float value)
     {
         var curves = _motionData.Curves;
@@ -783,10 +783,10 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// パラメータに対するフェードインの時間を取得する。
+    /// 获取指定参数的淡入时间。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <returns>フェードインにかかる時間[秒]</returns>
+    /// <param name="parameterId">参数 ID</param>
+    /// <returns>淡入所需时间[秒]</returns>
     public float GetParameterFadeInTime(string parameterId)
     {
         var curves = _motionData.Curves;
@@ -803,10 +803,10 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// パラメータに対するフェードアウトの時間を取得する。
+    /// 获取指定参数的淡出时间。
     /// </summary>
-    /// <param name="parameterId">パラメータID</param>
-    /// <returns>フェードアウトにかかる時間[秒]</returns>
+    /// <param name="parameterId">参数 ID</param>
+    /// <returns>淡出所需时间[秒]</returns>
     public float GetParameterFadeOutTime(string parameterId)
     {
         var curves = _motionData.Curves;
@@ -823,10 +823,10 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// 自動エフェクトがかかっているパラメータIDリストを設定する。
+    /// 设置自动效果应用的参数 ID 列表。
     /// </summary>
-    /// <param name="eyeBlinkParameterIds">自動まばたきがかかっているパラメータIDのリスト</param>
-    /// <param name="lipSyncParameterIds">リップシンクがかかっているパラメータIDのリスト</param>
+    /// <param name="eyeBlinkParameterIds">应用自动眼驱的参数 ID 列表</param>
+    /// <param name="lipSyncParameterIds">应用口型同步的参数 ID 列表</param>
     public void SetEffectIds(List<string> eyeBlinkParameterIds, List<string> lipSyncParameterIds)
     {
         _eyeBlinkParameterIds = eyeBlinkParameterIds;
@@ -834,16 +834,16 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// イベント発火のチェック。
-    /// 入力する時間は呼ばれるモーションタイミングを０とした秒数で行う。
+    /// 检测事件是否触发。
+    /// 输入时间以该动作调用时刻为 0 的秒数进行计算。
     /// </summary>
-    /// <param name="beforeCheckTimeSeconds">前回のイベントチェック時間[秒]</param>
-    /// <param name="motionTimeSeconds">今回の再生時間[秒]</param>
+    /// <param name="beforeCheckTimeSeconds">上一次事件检测时间[秒]</param>
+    /// <param name="motionTimeSeconds">本次播放时间[秒]</param>
     /// <returns></returns>
     public override List<string> GetFiredEvent(float beforeCheckTimeSeconds, float motionTimeSeconds)
     {
         FiredEventValues.Clear();
-        /// イベントの発火チェック
+        /// 事件触发检查
         for (int u = 0; u < _motionData.EventCount; ++u)
         {
             if ((_motionData.Events[u].FireTime > beforeCheckTimeSeconds) &&
@@ -858,10 +858,10 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// 透明度のカーブが存在するかどうかを確認する
+    /// 检查是否存在不透明度曲线
     /// </summary>
-    /// <returns>true  . キーが存在する
-    /// false . キーが存在しない</returns>
+    /// <returns>true  . 存在键
+    /// false . 不存在键</returns>
     public override bool IsExistModelOpacity()
     {
         for (int i = 0; i < _motionData.CurveCount; i++)
@@ -883,9 +883,9 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// 透明度のカーブのインデックスを返す
+    /// 返回不透明度曲线的索引
     /// </summary>
-    /// <returns>透明度のカーブのインデックス</returns>
+    /// <returns>不透明度曲线的索引</returns>
     public override int GetModelOpacityIndex()
     {
         if (IsExistModelOpacity())
@@ -910,9 +910,9 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// 透明度のIdを返す
+    /// 返回不透明度的 Id
     /// </summary>
-    /// <returns>透明度のId</returns>
+    /// <returns>不透明度的 Id</returns>
     public override string? GetModelOpacityId(int index)
     {
         if (index != -1)
@@ -932,10 +932,9 @@ public class CubismMotion : ACubismMotion
     }
 
     /// <summary>
-    /// 透明度の値を返す
-    /// 更新後の値を取るにはUpdateParameters() の後に呼び出す。
+    /// 返回不透明度的假，调用 UpdateParameters() 后获取更新后的假。
     /// </summary>
-    /// <returns>モーションの現在時間のOpacityの値</returns>
+    /// <returns>动作当前时刻的不透明度假</returns>
     public override float GetModelOpacityValue()
     {
         return _modelOpacity;

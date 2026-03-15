@@ -3,7 +3,7 @@
 namespace Live2DCSharpSDK.Framework.Model;
 
 /// <summary>
-/// ユーザデータをロード、管理、検索インターフェイス、解放までを行う。
+/// 负责用户数据的加载、管理、检索接口及释放。
 /// </summary>
 public class CubismModelUserData
 {
@@ -17,18 +17,18 @@ public class CubismModelUserData
     public const string Value = "Value";
 
     /// <summary>
-    /// ユーザデータ構造体配列
+    /// 用户数据结构体数组
     /// </summary>
     private readonly List<CubismModelUserDataNode> _userDataNodes = [];
     /// <summary>
-    /// 閲覧リスト保持
+    /// 访问列表保持
     /// </summary>
     public readonly List<CubismModelUserDataNode> ArtMeshUserDataNodes = [];
 
     /// <summary>
-    /// userdata3.jsonをパースする。
+    /// 解析 userdata3.json。
     /// </summary>
-    /// <param name="data">userdata3.jsonが読み込まれいるバッファ</param>
+    /// <param name="data">已加载 userdata3.json 的文件路径</param>
     public CubismModelUserData(string data)
     {
         using var stream = File.Open(data, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
