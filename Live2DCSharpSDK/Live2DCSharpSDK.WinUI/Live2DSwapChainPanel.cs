@@ -12,9 +12,9 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 {
 
 
-    private readonly LAppDelegateD3D11 _lApp;
+    public LAppDelegateD3D11 LApp { get; private set; }
 
-
+    private readonly System.Timers.Timer _timer;
 
     public Live2DSwapChainPanel() : base()
     {
@@ -25,14 +25,35 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
             var cubismOption = new CubismOption()
             {
                 LogFunction = (message) => Debug.WriteLine(message),
+#if DEBUG
                 LoggingLevel = LogLevel.Debug,
+#else
+                LoggingLevel = LogLevel.Warning,
+#endif
             };
             CubismFramework.StartUp(cubismAllocator, cubismOption);
         }
-        _lApp = new LAppDelegateD3D11(_d3d11Device, _d3d11Context);
+        LApp = new LAppDelegateD3D11(_d3d11Device, _d3d11Context);
         this.PointerPressed += Live2DSwapChainPanel_PointerPressed;
         this.PointerReleased += Live2DSwapChainPanel_PointerReleased;
         this.PointerMoved += Live2DSwapChainPanel_PointerMoved;
+        _timer = new System.Timers.Timer(Random.Shared.Next(10_000, 20_000));
+        _timer.Elapsed += _timer_Elapsed;
+        _timer.Start();
+    }
+
+
+
+    private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        if (_modelLoaded)
+        {
+            if (LApp.Live2dManager.GetModelNum() > 0)
+            {
+                LApp.Live2dManager.GetModel(0).TryStartIdleMotion();
+                _timer.Interval = Random.Shared.Next(20_000, 40_000);
+            }
+        }
     }
 
 
@@ -40,8 +61,8 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
     protected override void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
         base.OnSizeChanged(sender, e);
-        _lApp.Width = (int)(ActualWidth * CompositionScaleX);
-        _lApp.Height = (int)(ActualHeight * CompositionScaleY);
+        LApp.Width = (int)(ActualWidth * CompositionScaleX);
+        LApp.Height = (int)(ActualHeight * CompositionScaleY);
     }
 
 
@@ -49,8 +70,8 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
     protected override void OnCompositionScaleChanged(SwapChainPanel sender, object args)
     {
         base.OnCompositionScaleChanged(sender, args);
-        _lApp.Width = (int)(ActualWidth * CompositionScaleX);
-        _lApp.Height = (int)(ActualHeight * CompositionScaleY);
+        LApp.Width = (int)(ActualWidth * CompositionScaleX);
+        LApp.Height = (int)(ActualHeight * CompositionScaleY);
     }
 
 
@@ -61,7 +82,7 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
     public void LoadModel(string folder, string name)
     {
-        _lApp.Live2dManager.LoadModel(folder, name);
+        LApp.Live2dManager.LoadModel(folder, name);
         _modelLoaded = true;
         lastTs = Stopwatch.GetTimestamp();
     }
@@ -71,7 +92,7 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
     public void RemoveAllModels()
     {
         _modelLoaded = false;
-        _lApp.Live2dManager.ReleaseAllModel();
+        LApp.Live2dManager.ReleaseAllModel();
     }
 
 
@@ -84,11 +105,24 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
         if (_modelLoaded)
         {
             long ts = Stopwatch.GetTimestamp();
-            _lApp.Run((ts - lastTs) / (float)Stopwatch.Frequency);
+            LApp.Run((ts - lastTs) / (float)Stopwatch.Frequency);
             lastTs = ts;
             Present();
         }
     }
+
+
+
+
+    public void MouseDragged(float x, float y)
+    {
+        if (_modelLoaded)
+        {
+            LApp.Live2dManager.OnDrag(x, y);
+        }
+    }
+
+
 
 
 
@@ -101,26 +135,33 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
     private void Live2DSwapChainPanel_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        this.CapturePointer(e.Pointer);
-        _pointerPressed = true;
-        _pointerMoved = false;
-        _lastPointPosition = e.GetCurrentPoint(this).Position;
+        var point = e.GetCurrentPoint(this);
+        if (point.Properties.IsLeftButtonPressed)
+        {
+            this.CapturePointer(e.Pointer);
+            _pointerPressed = true;
+            _pointerMoved = false;
+            _lastPointPosition = e.GetCurrentPoint(this).Position;
+        }
     }
 
 
     private void Live2DSwapChainPanel_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         this.ReleasePointerCapture(e.Pointer);
-        _lApp.Live2dManager.OnDrag(0, 0);
-        if (!_pointerMoved)
+        if (_pointerPressed)
         {
-            Point p = e.GetCurrentPoint(this).Position;
-            double x = p.X * 2 / this.ActualWidth - 1;
-            double y = 1 - p.Y * 2 / this.ActualHeight;
-            _lApp.Live2dManager.OnTap((float)x, (float)y);
+            LApp.Live2dManager.OnDrag(0, 0);
+            if (!_pointerMoved)
+            {
+                Point p = e.GetCurrentPoint(this).Position;
+                double x = p.X * 2 / this.ActualWidth - 1;
+                double y = 1 - p.Y * 2 / this.ActualHeight;
+                LApp.Live2dManager.OnTap((float)x, (float)y);
+            }
+            _pointerPressed = false;
+            _pointerMoved = false;
         }
-        _pointerPressed = false;
-        _pointerMoved = false;
     }
 
 
@@ -133,15 +174,8 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
             {
                 _pointerMoved = true;
             }
-            else if (_pointerMoved)
-            {
-                double x = p.X * 2 / this.ActualWidth - 1;
-                double y = 1 - p.Y * 2 / this.ActualHeight;
-                _lApp.Live2dManager.OnDrag((float)x, (float)y);
-            }
         }
     }
-
 
 
 
