@@ -1,0 +1,21 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Demo/">
+    <Project Path="Demo/App1/App1.csproj">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="Demo/WpfApp1/WpfApp1.csproj" />
+  </Folder>
+  <Folder Name="/Live2DCSharpSDK/">
+    <Project Path="Live2DCSharpSDK/Live2DCSharpSDK.D3D11/Live2DCSharpSDK.D3D11.csproj" />
+    <Project Path="Live2DCSharpSDK/Live2DCSharpSDK.Framework/Live2DCSharpSDK.Framework.csproj" />
+    <Project Path="Live2DCSharpSDK/Live2DCSharpSDK.WinUI/Live2DCSharpSDK.WinUI.csproj" />
+    <Project Path="Live2DCSharpSDK/Live2DCSharpSDK.WPF/Live2DCSharpSDK.WPF.csproj" Id="c1ddf4dd-cba8-4e7a-8b1b-be8e46330a1f" />
+  </Folder>
+</Solution>
