@@ -1,0 +1,409 @@
+{
+    "Version": 3,
+    "ConfVer": 0,
+    "Type": 0,
+    "FileReferences": {
+        "Moc": "FileReferences_Moc_0.moc3",
+        "Textures": [
+            "textures/FileReferences_Textures_0_0.png"
+        ],
+        "Physics": "physics/FileReferences_Physics_0.physic3.json",
+        "PhysicsV2": {
+            "File": "physics/FileReferences_Physics_0.physic3.json"
+        },
+        "Motions": {
+            "其他组#3": [
+                {
+                    "Name": "回正",
+                    "WrapMode": 2,
+                    "Sound": "sounds/FileReferences_Motions_其他组#3_0_Sound_0.mp3",
+                    "Expression": "expression00.exp3",
+                    "MotionDuration": 50,
+                    "NextMtn": "其他组#2:回正"
+                },
+                {
+                    "Name": "墨镜（点击）",
+                    "WrapMode": 2,
+                    "Expression": "expression1.exp3",
+                    "Interruptable": true
+                }
+            ],
+            "其他组#2": [
+                {
+                    "Name": "回正",
+                    "WrapMode": 2,
+                    "Sound": "sounds/FileReferences_Motions_其他组#3_0_Sound_0.mp3",
+                    "Expression": "expression00.exp3",
+                    "MotionDuration": 50,
+                    "NextMtn": "表情组:回正"
+                },
+                {
+                    "Name": "猫耳（点击）",
+                    "WrapMode": 2,
+                    "Expression": "expression2.exp3",
+                    "Interruptable": true
+                }
+            ],
+            "表情组": [
+                {
+                    "Name": "回正",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "WrapMode": 2,
+                    "Sound": "sounds/FileReferences_Motions_其他组#3_0_Sound_0.mp3",
+                    "Expression": "expression00.exp3",
+                    "MotionDuration": 50,
+                    "Priority": 4,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 1"
+                        }
+                    ]
+                },
+                {
+                    "Name": "使一颗心免于哀伤（点击）",
+                    "File": "motions/FileReferences_Motions_表情组_1_File_0.motion3.json",
+                    "WrapMode": 2,
+                    "Sound": "sounds/FileReferences_Motions_表情组_1_Sound_0.mp3",
+                    "SoundDelay": 500,
+                    "Expression": "expression00.exp3",
+                    "Priority": 3,
+                    "NextMtn": "表情组:回正",
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "点燃星海（点击）",
+                    "File": "motions/FileReferences_Motions_表情组_2_File_0.motion3.json",
+                    "WrapMode": 2,
+                    "Sound": "sounds/FileReferences_Motions_表情组_2_Sound_0.mp3",
+                    "Expression": "expression00.exp3",
+                    "Priority": 3,
+                    "NextMtn": "表情组:回正",
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "难受（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression3.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "鄙夷（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression4.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "生气（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression5.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "疑问（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression6.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "哭泣（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression7.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "流汗（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression8.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "呆愣（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression9.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                },
+                {
+                    "Name": "嘻嘻（按键）",
+                    "File": "motions/FileReferences_Motions_表情组_0_File_0.motion3.json",
+                    "Expression": "expression10.exp3",
+                    "Priority": 3,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 0"
+                        }
+                    ]
+                }
+            ],
+            "Tick2": [
+                {
+                    "Name": "笑一笑（待机）",
+                    "File": "motions/FileReferences_Motions_Tick2_0_File_0.motion3.json",
+                    "WrapMode": 2,
+                    "Expression": "expression00.exp3",
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 1,
+                            "Code": "equal 1"
+                        }
+                    ]
+                },
+                {
+                    "Name": "一起看（待机）",
+                    "File": "motions/FileReferences_Motions_Tick2_1_File_0.motion3.json",
+                    "WrapMode": 2,
+                    "Expression": "expression00.exp3",
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 1,
+                            "Code": "equal 1"
+                        }
+                    ]
+                },
+                {
+                    "Name": "很可爱（待机）",
+                    "File": "motions/FileReferences_Motions_Tick2_2_File_0.motion3.json",
+                    "WrapMode": 2,
+                    "Expression": "expression00.exp3",
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 1,
+                            "Code": "equal 1"
+                        }
+                    ]
+                }
+            ],
+            "Start": [
+                {
+                    "Name": "初始化",
+                    "WrapMode": 2,
+                    "VarFloats": [
+                        {
+                            "Name": "stop",
+                            "Type": 2,
+                            "Code": "assign 1"
+                        }
+                    ]
+                }
+            ]
+        },
+        "Expressions": [
+            {
+                "Name": "expression00.exp3",
+                "File": "expressions/FileReferences_Expressions_0_File_0.exp3.json"
+            },
+            {
+                "Name": "expression1.exp3",
+                "File": "expressions/FileReferences_Expressions_1_File_0.exp3.json"
+            },
+            {
+                "Name": "expression2.exp3",
+                "File": "expressions/FileReferences_Expressions_2_File_0.exp3.json"
+            },
+            {
+                "Name": "expression3.exp3",
+                "File": "expressions/FileReferences_Expressions_3_File_0.exp3.json"
+            },
+            {
+                "Name": "expression4.exp3",
+                "File": "expressions/FileReferences_Expressions_4_File_0.exp3.json"
+            },
+            {
+                "Name": "expression5.exp3",
+                "File": "expressions/FileReferences_Expressions_5_File_0.exp3.json"
+            },
+            {
+                "Name": "expression6.exp3",
+                "File": "expressions/FileReferences_Expressions_6_File_0.exp3.json"
+            },
+            {
+                "Name": "expression7.exp3",
+                "File": "expressions/FileReferences_Expressions_7_File_0.exp3.json"
+            },
+            {
+                "Name": "expression8.exp3",
+                "File": "expressions/FileReferences_Expressions_8_File_0.exp3.json"
+            },
+            {
+                "Name": "expression9.exp3",
+                "File": "expressions/FileReferences_Expressions_9_File_0.exp3.json"
+            },
+            {
+                "Name": "expression10.exp3",
+                "File": "expressions/FileReferences_Expressions_10_File_0.exp3.json"
+            }
+        ]
+    },
+    "Controllers": {
+        "ParamHit": {},
+        "ParamLoop": {},
+        "KeyTrigger": {
+            "Enabled": true
+        },
+        "ParamTrigger": {},
+        "AreaTrigger": {
+            "Enabled": true
+        },
+        "HandTrigger": {},
+        "EyeBlink": {
+            "MinInterval": 500,
+            "MaxInterval": 6000,
+            "Items": [
+                {
+                    "Id": "ParamEyeLOpen",
+                    "Min": 0.0,
+                    "Max": 1.0,
+                    "BlendMode": 2,
+                    "Input": 0
+                },
+                {
+                    "Id": "ParamEyeROpen",
+                    "Min": 0.0,
+                    "Max": 1.0,
+                    "BlendMode": 2,
+                    "Input": 0
+                }
+            ],
+            "Enabled": true
+        },
+        "LipSync": {
+            "Gain": 5.0
+        },
+        "MouseTracking": {
+            "SmoothTime": 0.15,
+            "Enabled": true
+        },
+        "AutoBreath": {
+            "Enabled": true
+        },
+        "ExtraMotion": {
+            "Enabled": true
+        },
+        "Accelerometer": {
+            "Enabled": true
+        },
+        "Microphone": {},
+        "Transform": {},
+        "FaceTracking": {
+            "Enabled": true
+        },
+        "HandTracking": {},
+        "ParamValue": {},
+        "PartOpacity": {},
+        "ArtmeshOpacity": {},
+        "ArtmeshColor": {},
+        "ArtmeshCulling": {
+            "DefaultMode": 0
+        },
+        "IntimacySystem": {}
+    },
+    "HitAreas": [
+        {
+            "Name": "饮料",
+            "Id": "ArtMesh153",
+            "Order": 1,
+            "Motion": "其他组#3:回正"
+        },
+        {
+            "Name": "蛋糕",
+            "Id": "ArtMesh154",
+            "Motion": "表情组:使一颗心免于哀伤（点击）"
+        },
+        {
+            "Name": "刘海",
+            "Id": "ArtMesh23",
+            "Motion": "其他组#3:墨镜（点击）"
+        },
+        {
+            "Name": "左侧后发",
+            "Id": "ArtMesh147",
+            "Motion": "表情组:点燃星海（点击）"
+        },
+        {
+            "Name": "右侧后发",
+            "Id": "ArtMesh150",
+            "Motion": "其他组#2:猫耳（点击）"
+        }
+    ],
+    "Groups": [
+        {
+            "Target": "Parameter",
+            "Name": "EyeBlink",
+            "Ids": [
+                "ParamEyeLOpen",
+                "ParamEyeROpen"
+            ]
+        }
+    ],
+    "Options": {
+        "TexFixed": true,
+        "TexType": 0
+    }
+}
