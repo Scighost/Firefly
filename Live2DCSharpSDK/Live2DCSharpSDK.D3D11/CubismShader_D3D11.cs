@@ -216,7 +216,7 @@ float4 PixelMaskedInvertedPremult(VS_OUT In) : SV_Target{
         // Normal
         LoadShaderProgram(device, false, ShaderNames.ShaderNames_Normal, "VertNormal");
         LoadShaderProgram(device, false, ShaderNames.ShaderNames_NormalMasked, "VertMasked");
-        
+
         // Inverted/PremultipliedAlpha variants share the same VS bytecode; AddRef so each slot owns its reference
         _shaderSetsVS[(int)ShaderNames.ShaderNames_NormalMasked].AddRef();
         _shaderSetsVS[(int)ShaderNames.ShaderNames_NormalMaskedInverted] = _shaderSetsVS[(int)ShaderNames.ShaderNames_NormalMasked];

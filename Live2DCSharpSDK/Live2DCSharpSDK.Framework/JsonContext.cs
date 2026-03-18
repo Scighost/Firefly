@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Serialization;
-using Live2DCSharpSDK.Framework.Model;
+﻿using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Motion;
 using Live2DCSharpSDK.Framework.Physics;
+using System.Text.Json.Serialization;
 
 namespace Live2DCSharpSDK.Framework;
 

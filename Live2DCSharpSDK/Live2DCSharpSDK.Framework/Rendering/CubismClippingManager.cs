@@ -1,7 +1,7 @@
-﻿using System.Numerics;
-using Live2DCSharpSDK.Framework.Math;
+﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
 using Live2DCSharpSDK.Framework.Type;
+using System.Numerics;
 
 namespace Live2DCSharpSDK.Framework.Rendering;
 

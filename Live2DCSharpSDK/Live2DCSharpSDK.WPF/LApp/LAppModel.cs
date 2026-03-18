@@ -908,4 +908,62 @@ public class LAppModel : CubismUserModel
             _motions[name] = tmpMotion;
         }
     }
+
+
+
+    public unsafe bool HitAnyDrawable(float pointX, float pointY)
+    {
+        int drawableCount = Model.GetDrawableCount();
+        for (int i = 0; i < drawableCount; i++)
+        {
+            var count = Model.GetDrawableVertexCount(i);
+            var vertices = Model.GetDrawableVertices(i);
+
+            var left = vertices[0];
+            var right = vertices[0];
+            var top = vertices[1];
+            var bottom = vertices[1];
+
+            for (int j = 1; j < count; ++j)
+            {
+                var x = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep];
+                var y = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep + 1];
+
+                if (x < left)
+                {
+                    left = x; // Min x
+                }
+
+                if (x > right)
+                {
+                    right = x; // Max x
+                }
+
+                if (y < top)
+                {
+                    top = y; // Min y
+                }
+
+                if (y > bottom)
+                {
+                    bottom = y; // Max y
+                }
+            }
+
+            var tx = ModelMatrix.InvertTransformX(pointX);
+            var ty = ModelMatrix.InvertTransformY(pointY);
+
+            bool hit = (left <= tx) && (tx <= right) && (top <= ty) && (ty <= bottom);
+            if (hit)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+
 }

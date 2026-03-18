@@ -139,38 +139,6 @@ public class Live2DImage : D3DImage, IDisposable
         LApp.Live2dManager.ReleaseAllModel();
     }
 
-    private FrameworkElement? _host;
-
-    /// <summary>
-    /// 绑定宿主元素（通常是承载此 D3DImage 的 &lt;Image&gt;）。
-    /// 宿主尺寸变化时会自动调用 SetSize，无需在 XAML 中手动触发。
-    /// </summary>
-    public void Attach(FrameworkElement host)
-    {
-        if (_host != null)
-        {
-            _host.SizeChanged -= OnHostSizeChanged;
-            _host.Loaded -= OnHostLoaded;
-        }
-        _host = host;
-        _host.SizeChanged += OnHostSizeChanged;
-        _host.Loaded += OnHostLoaded;
-
-        // 若宿主已布局完成则立即更新尺寸
-        if (host.ActualWidth > 0 && host.ActualHeight > 0)
-            SetSize((int)host.ActualWidth, (int)host.ActualHeight);
-    }
-
-    private void OnHostLoaded(object sender, RoutedEventArgs e)
-    {
-        if (_host is { ActualWidth: > 0, ActualHeight: > 0 })
-            SetSize((int)_host.ActualWidth, (int)_host.ActualHeight);
-    }
-
-    private void OnHostSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        SetSize((int)e.NewSize.Width, (int)e.NewSize.Height);
-    }
 
     public void MouseDragged(float x, float y)
     {
@@ -317,13 +285,6 @@ public class Live2DImage : D3DImage, IDisposable
         IsFrontBufferAvailableChanged -= OnFrontBufferAvailableChanged;
         _idleTimer.Stop();
         _idleTimer.Dispose();
-
-        if (_host != null)
-        {
-            _host.SizeChanged -= OnHostSizeChanged;
-            _host.Loaded -= OnHostLoaded;
-            _host = null;
-        }
 
         LApp?.Dispose();
 

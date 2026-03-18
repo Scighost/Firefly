@@ -218,6 +218,41 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
         return _models.Count;
     }
 
+
+    public bool HitAnyDrawable(float x, float y)
+    {
+        int width = lapp.WindowWidth;
+        int height = lapp.WindowHeight;
+
+        foreach (var model in _models)
+        {
+            // OnDraw 中叠加了投影缩放，命中测试需要施加其逆变换
+            float canvasW = model.Model.GetCanvasWidth();
+            float canvasH = model.Model.GetCanvasHeight();
+            float tx, ty;
+            if (canvasW * height > canvasH * width)
+            {
+                // OnDraw: Scale(1.0, width/height) → 逆: y *= height/width
+                tx = x;
+                ty = y * height / width;
+            }
+            else
+            {
+                // OnDraw: Scale(height/width, 1.0) → 逆: x *= width/height
+                tx = x * width / height;
+                ty = y;
+            }
+
+            bool hit = model.HitAnyDrawable(x, y);
+            if (hit)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public void Dispose()
     {
         ReleaseAllModel();

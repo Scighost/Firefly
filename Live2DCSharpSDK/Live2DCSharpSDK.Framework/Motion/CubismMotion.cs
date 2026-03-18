@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
-using Live2DCSharpSDK.Framework.Math;
+﻿using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
+using System.Text.Json;
 
 namespace Live2DCSharpSDK.Framework.Motion;
 

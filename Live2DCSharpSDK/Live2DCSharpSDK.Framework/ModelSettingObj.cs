@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Live2DCSharpSDK.Framework;
+﻿namespace Live2DCSharpSDK.Framework;
 
 public record ModelSettingObj
 {

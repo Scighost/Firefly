@@ -1,6 +1,6 @@
-﻿using System.Numerics;
-using Live2DCSharpSDK.Framework.Core;
+﻿using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Rendering;
+using System.Numerics;
 
 namespace Live2DCSharpSDK.Framework.Model;
 

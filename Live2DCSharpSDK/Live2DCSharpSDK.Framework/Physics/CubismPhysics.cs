@@ -1,8 +1,8 @@
-﻿using System.Numerics;
-using System.Text.Json;
-using Live2DCSharpSDK.Framework.Core;
+﻿using Live2DCSharpSDK.Framework.Core;
 using Live2DCSharpSDK.Framework.Math;
 using Live2DCSharpSDK.Framework.Model;
+using System.Numerics;
+using System.Text.Json;
 
 namespace Live2DCSharpSDK.Framework.Physics;
 
