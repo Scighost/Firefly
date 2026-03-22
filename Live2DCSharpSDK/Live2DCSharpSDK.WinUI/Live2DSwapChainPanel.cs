@@ -34,9 +34,9 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
             CubismFramework.StartUp(cubismAllocator, cubismOption);
         }
         LApp = new LAppDelegateD3D11(_d3d11Device, _d3d11Context);
-        this.PointerPressed += Live2DSwapChainPanel_PointerPressed;
-        this.PointerReleased += Live2DSwapChainPanel_PointerReleased;
-        this.PointerMoved += Live2DSwapChainPanel_PointerMoved;
+        PointerPressed += Live2DSwapChainPanel_PointerPressed;
+        PointerReleased += Live2DSwapChainPanel_PointerReleased;
+        PointerMoved += Live2DSwapChainPanel_PointerMoved;
         _timer = new System.Timers.Timer(Random.Shared.Next(10_000, 20_000));
         _timer.Elapsed += _timer_Elapsed;
         _timer.Start();
@@ -76,6 +76,19 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
 
 
+    protected override void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        _timer.Dispose();
+        PointerPressed -= Live2DSwapChainPanel_PointerPressed;
+        PointerReleased -= Live2DSwapChainPanel_PointerReleased;
+        PointerMoved -= Live2DSwapChainPanel_PointerMoved;
+        _modelLoaded = false;
+        LApp.Dispose();
+        LApp = null;
+        base.OnUnloaded(sender, e);
+    }
+
+
 
     bool _modelLoaded;
 
@@ -101,6 +114,10 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
     protected override void OnRendering(object sender, object e)
     {
+        if (RenderPaused)
+        {
+            return;
+        }
         base.OnRendering(sender, e);
         if (_modelLoaded)
         {
@@ -175,6 +192,19 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
                 _pointerMoved = true;
             }
         }
+    }
+
+
+
+    public void PauseRender()
+    {
+        RenderPaused = true;
+    }
+
+
+    public void ResumeRender()
+    {
+        RenderPaused = false;
     }
 
 

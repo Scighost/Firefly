@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Firefly": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

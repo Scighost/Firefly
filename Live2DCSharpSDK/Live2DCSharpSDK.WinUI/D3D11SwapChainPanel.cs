@@ -28,6 +28,9 @@ public partial class D3D11SwapChainPanel : SwapChainPanel
     protected ComPtr<ID3D11RenderTargetView> _renderTargetView;
 
 
+    public bool RenderPaused { get; protected set; }
+
+
 
     public D3D11SwapChainPanel()
     {
@@ -60,12 +63,17 @@ public partial class D3D11SwapChainPanel : SwapChainPanel
         _swapChain.Dispose();
         _d3d11Context.Dispose();
         _d3d11Device.Dispose();
+        _d3d11Api.Dispose();
     }
 
 
 
     protected virtual unsafe void OnRendering(object sender, object e)
     {
+        if (RenderPaused)
+        {
+            return;
+        }
         if (_d3d11Context.Handle is null || _renderTargetView.Handle is null)
         {
             return;
@@ -166,7 +174,7 @@ public partial class D3D11SwapChainPanel : SwapChainPanel
     }
 
 
-    public unsafe void Present()
+    public void Present()
     {
         HResult hr = _swapChain.Present(0, 0);
 

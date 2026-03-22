@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>Firefly</RootNamespace>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x86;x64;ARM64</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
+		<UseWinUI>true</UseWinUI>
+		<WinUISDKReferences>false</WinUISDKReferences>
+		<EnableMsixTooling>true</EnableMsixTooling>
+		<Nullable>enable</Nullable>
+		<CETCompat>false</CETCompat>
+		<ApplicationIcon>..\logo.ico</ApplicationIcon>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<CsWinRTAotOptimizerEnabled Condition="'$(Configuration)' == 'Debug'">false</CsWinRTAotOptimizerEnabled>
+		<CsWinRTAotOptimizerEnabled Condition="'$(Configuration)' != 'Debug'">true</CsWinRTAotOptimizerEnabled>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+		<PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
+		<PackageReference Include="Vanara.PInvoke.ComCtl32" Version="5.0.1" />
+		<PackageReference Include="Vanara.PInvoke.DwmApi" Version="5.0.1" />
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Live2DCSharpSDK\Live2DCSharpSDK.WinUI\Live2DCSharpSDK.WinUI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\model\**">
+			<Link>model\%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<Target Name="RemoveDlls" AfterTargets="Publish">
+		<Delete Files="$(PublishDir)Microsoft.Web.WebView2.Core.dll" />
+		<Delete Files="$(PublishDir)Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.dll" />
+		<Delete Files="$(PublishDir)WebView2Loader.dll" />
+	</Target>
+
+</Project>

@@ -18,4 +18,13 @@
     <Project Path="Live2DCSharpSDK/Live2DCSharpSDK.WinUI/Live2DCSharpSDK.WinUI.csproj" />
     <Project Path="Live2DCSharpSDK/Live2DCSharpSDK.WPF/Live2DCSharpSDK.WPF.csproj" Id="c1ddf4dd-cba8-4e7a-8b1b-be8e46330a1f" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="Firefly/Firefly.csproj" Id="193b5dcb-a38a-486b-abfd-d8dbc838a7da">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Deploy />
+  </Project>
 </Solution>

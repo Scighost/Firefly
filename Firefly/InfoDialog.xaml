@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog x:Class="Firefly.InfoDialog"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+               xmlns:local="using:Firefly"
+               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+               x:DefaultBindMode="OneWay"
+               Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+               BorderThickness="0"
+               CornerRadius="8"
+               Style="{ThemeResource DefaultContentDialogStyle}"
+               mc:Ignorable="d">
+
+    <ContentDialog.Resources>
+        <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
+        <Thickness x:Key="ContentDialogPadding">0</Thickness>
+        <StaticResource x:Key="ContentDialogSmokeFill" ResourceKey="ControlFillColorTransparentBrush" />
+        <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="ControlFillColorTransparentBrush" />
+    </ContentDialog.Resources>
+
+    <Grid>
+
+
+
+        <StackPanel Margin="12">
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="Firefly" />
+                <HyperlinkButton Margin="8,0,0,0"
+                                 Padding="0"
+                                 VerticalAlignment="Center"
+                                 BorderThickness="0"
+                                 CornerRadius="8"
+                                 NavigateUri="{x:Bind NewRelease.Link}"
+                                 Visibility="{x:Bind NewVersionVisbility}">
+                    <Border Padding="6,2,6,2" Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}">
+                        <TextBlock FontSize="12" Foreground="{ThemeResource SystemFillColorSuccessBrush}">
+                            <Run Text="新版本" />
+                            <Run Text="{x:Bind NewRelease.Version}" />
+                        </TextBlock>
+                    </Border>
+                </HyperlinkButton>
+            </StackPanel>
+
+            <TextBlock Margin="0,4,0,0"
+                       FontSize="12"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Text="把可爱的萤宝放在桌面上" />
+
+            <MenuFlyoutSeparator Margin="0,12,0,0" />
+
+            <StackPanel Margin="0,16,0,0"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                <FontIcon Margin="0,0,4,-2"
+                          VerticalAlignment="Center"
+                          FontSize="16"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          Glyph="&#xF158;" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Live2D 模型" />
+                <TextBlock>
+                    <Hyperlink NavigateUri="https://space.bilibili.com/457683484" UnderlineStyle="None">
+                        <Run Text="bilibili@是依七哒" />
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+
+            <StackPanel Margin="0,16,0,0"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                <FontIcon Margin="0,0,4,-2"
+                          VerticalAlignment="Center"
+                          FontSize="16"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          Glyph="&#xE71B;" />
+                <TextBlock>
+                    <Hyperlink NavigateUri="https://firefly.scighost.com" UnderlineStyle="None">
+                        <Run Text="主页" />
+                    </Hyperlink>
+                </TextBlock>
+                <TextBlock Margin="4,0,0,0">
+                    <Hyperlink NavigateUri="https://github.com/Scighost/Firefly" UnderlineStyle="None">
+                        <Run Text="源代码" />
+                    </Hyperlink>
+                </TextBlock>
+                <TextBlock Margin="4,0,0,0">
+                    <Hyperlink NavigateUri="https://github.com/Scighost/Firefly/blob/main/LICENSE" UnderlineStyle="None">
+                        <Run Text="LICENSE" />
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+
+
+            <TextBlock Width="352"
+                       Margin="0,20,0,0"
+                       HorizontalAlignment="Left"
+                       FontSize="11"
+                       Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                       Text="本软件及其包含的所有内容仅限个人学习使用，严禁以任何形式用于商业用途或从中获取经济利益。"
+                       TextWrapping="Wrap" />
+
+        </StackPanel>
+
+
+
+
+
+
+
+
+
+
+
+        <Button Width="28"
+                Height="28"
+                Margin="4"
+                Padding="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Command="{x:Bind CloseCommand}"
+                Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+            <FontIcon FontSize="16"
+                      Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                      Glyph="&#xE711;" />
+        </Button>
+
+    </Grid>
+
+</ContentDialog>
