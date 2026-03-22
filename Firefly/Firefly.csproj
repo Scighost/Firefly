@@ -13,6 +13,7 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<Nullable>enable</Nullable>
 		<CETCompat>false</CETCompat>
+		<Version>0.1.0</Version>
 		<ApplicationIcon>..\logo.ico</ApplicationIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
