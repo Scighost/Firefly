@@ -82,7 +82,6 @@ public sealed partial class MainWindow : Window
     {
         args.Cancel = true;
         Hide();
-        App.Current.Exit();
     }
 
 

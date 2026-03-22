@@ -6,7 +6,7 @@
                xmlns:local="using:Firefly"
                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                x:DefaultBindMode="OneWay"
-               Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+               Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                BorderThickness="0"
                CornerRadius="8"
                Style="{ThemeResource DefaultContentDialogStyle}"

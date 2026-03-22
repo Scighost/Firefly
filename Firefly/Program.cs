@@ -1,4 +1,7 @@
-﻿namespace Firefly;
+﻿using System;
+using Vanara.PInvoke;
+
+namespace Firefly;
 
 #if DISABLE_XAML_GENERATED_MAIN
 /// <summary>
@@ -11,6 +14,12 @@ public static partial class Program
     [global::System.STAThreadAttribute]
     static void Main(string[] args)
     {
+        if (Environment.OSVersion.Version < new Version("10.0.17763.0"))
+        {
+            User32.MessageBox(HWND.NULL, "本程序需要 Windows 10 1809 (版本 17763) 或更高版本才能运行。", "Firefly");
+            return;
+        }
+
 #if !MICROSOFT_WINDOWSAPPSDK_AUTOINITIALIZE_BOOTSTRAP
         WinAppRuntime.AccessWindowsAppSDK();
 #endif
