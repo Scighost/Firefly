@@ -26,6 +26,13 @@
                         <FontIcon Glyph="&#xE76E;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
+                <MenuFlyoutItem x:Name="MenuFlyoutItem_Opacity"
+                                Click="MenuFlyoutItem_Opacity_Click"
+                                Text="不透明度">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE711;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_CloseWindow"
                                 Click="MenuFlyoutItem_CloseWindow_Click"
                                 Text="关闭">
@@ -47,6 +54,19 @@
             <FontIcon VerticalAlignment="Center"
                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                       Glyph="&#xE7C2;" />
+            <Border.Resources>
+                <local:SwapChainOpacityToolTipValueConverter x:Key="SwapChainOpacityToolTipValueConverter" />
+            </Border.Resources>
+            <FlyoutBase.AttachedFlyout>
+                <Flyout Placement="Bottom">
+                    <Slider Width="200"
+                            Maximum="1"
+                            Minimum="0"
+                            StepFrequency="0.01"
+                            ThumbToolTipValueConverter="{StaticResource SwapChainOpacityToolTipValueConverter}"
+                            Value="{x:Bind live2dPanel.Opacity, Mode=TwoWay}" />
+                </Flyout>
+            </FlyoutBase.AttachedFlyout>
         </Border>
 
     </Grid>

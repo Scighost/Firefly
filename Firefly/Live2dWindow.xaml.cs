@@ -2,6 +2,8 @@ using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
 using System;
 using System.IO;
 using Vanara.PInvoke;
@@ -200,11 +202,34 @@ public sealed partial class Live2dWindow : Window
         }
     }
 
+    private void MenuFlyoutItem_Opacity_Click(object sender, RoutedEventArgs e)
+    {
+        FlyoutBase.ShowAttachedFlyout(Border_DragArea);
+    }
+
 
     private void MenuFlyoutItem_CloseWindow_Click(object sender, RoutedEventArgs e)
     {
         Close();
     }
 
+}
+
+
+public partial class SwapChainOpacityToolTipValueConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is double d)
+        {
+            return d.ToString("F2");
+        }
+        return "-";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
 
 }
