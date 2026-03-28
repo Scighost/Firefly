@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:l2d="using:Live2DCSharpSDK.WinUI"
+        xmlns:loc="using:Firefly.Localization"
         xmlns:local="using:Firefly"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Live2dWindow"
@@ -14,35 +15,35 @@
             <MenuFlyout x:Name="GridMenuFlyout" Placement="BottomEdgeAlignedLeft">
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_BorderlessWindow"
                                 Click="MenuFlyoutItem_BorderlessWindow_Click"
-                                Text="无边框 + 置顶">
+                                Text="{x:Bind loc:Lang.BorderlessAndAlwaysOnTop}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE78B;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_RandomMotion"
                                 Click="MenuFlyoutItem_RandomMotion_Click"
-                                Text="随机表情">
+                                Text="{x:Bind loc:Lang.RandomEmotion}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE76E;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_Opacity"
                                 Click="MenuFlyoutItem_Opacity_Click"
-                                Text="不透明度">
+                                Text="{x:Bind loc:Lang.Opacity}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE9E9;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_Flip"
                                 Click="MenuFlyoutItem_Flip_Click"
-                                Text="镜像翻转">
+                                Text="{x:Bind loc:Lang.Mirror}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE8AB;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_CloseWindow"
                                 Click="MenuFlyoutItem_CloseWindow_Click"
-                                Text="关闭">
+                                Text="{x:Bind loc:Lang.Close}">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE711;" />
                     </MenuFlyoutItem.Icon>

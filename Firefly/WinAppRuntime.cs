@@ -1,4 +1,5 @@
-﻿using Microsoft.Windows.ApplicationModel.DynamicDependency;
+﻿using Firefly.Localization;
+using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -114,7 +115,7 @@ internal partial class WinAppRuntime
                 UseShellExecute = true,
                 Verb = "runas",
             });
-            await p.WaitForExitAsync();
+            await p!.WaitForExitAsync();
 
             InstallSuccess = p.ExitCode is 0;
         }
@@ -126,7 +127,7 @@ internal partial class WinAppRuntime
 
     private int CreateDialog()
     {
-        var button = new ComCtl32.TASKDIALOG_BUTTON { nButtonID = 1001, pszButtonText = StringHelper.AllocString("手动下载") };
+        var button = new ComCtl32.TASKDIALOG_BUTTON { nButtonID = 1001, pszButtonText = StringHelper.AllocString(Lang.DownloadManually) };
         GCHandle handle = GCHandle.Alloc(button, GCHandleType.Pinned);
         using var config = new ComCtl32.TASKDIALOGCONFIG()
         {
@@ -136,8 +137,8 @@ internal partial class WinAppRuntime
                     | ComCtl32.TASKDIALOG_FLAGS.TDF_CALLBACK_TIMER,
             dwCommonButtons = ComCtl32.TASKDIALOG_COMMON_BUTTON_FLAGS.TDCBF_CANCEL_BUTTON,
             WindowTitle = "Firefly",
-            MainInstruction = "安装必要组件",
-            Content = "正在下载 Windows App Runtime\n",
+            MainInstruction = Lang.InstallRequiredComponents,
+            Content = Lang.DownloadingWindowsAppRuntime + "\n",
             mainIcon = User32.LoadIcon(Kernel32.GetModuleHandle(), "#32512").DangerousGetHandle(),
             cButtons = 1,
             pButtons = handle.AddrOfPinnedObject(),
@@ -166,7 +167,7 @@ internal partial class WinAppRuntime
                     }
                     else
                     {
-                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, "下载或安装失败\n");
+                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, Lang.DownloadOrInstallationFailed + "\n");
                     }
                 }
                 else
@@ -174,15 +175,15 @@ internal partial class WinAppRuntime
                     if (TotalBytes > 0)
                     {
                         User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_PROGRESS_BAR_POS, (IntPtr)(DownloadBytes * 100 / TotalBytes), IntPtr.Zero);
-                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, $"正在下载 Windows App Runtime\n{DownloadBytes / MB:F2}/{TotalBytes / MB:F2} MB");
+                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, $"{Lang.DownloadingWindowsAppRuntime}\n{DownloadBytes / MB:F2}/{TotalBytes / MB:F2} MB");
                     }
                     else if (DownloadBytes > 0)
                     {
-                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, $"正在下载 Windows App Runtime\n{DownloadBytes / MB:F2} MB");
+                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, $"{Lang.DownloadingWindowsAppRuntime}\n{DownloadBytes / MB:F2} MB");
                     }
                     else
                     {
-                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, $"正在下载 Windows App Runtime\n");
+                        User32.SendMessage(hwnd, ComCtl32.TaskDialogMessage.TDM_SET_ELEMENT_TEXT, (IntPtr)ComCtl32.TASKDIALOG_ELEMENTS.TDE_CONTENT, $"{Lang.DownloadingWindowsAppRuntime}\n");
                     }
                 }
                 break;

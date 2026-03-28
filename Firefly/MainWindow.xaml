@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:l2d="using:Live2DCSharpSDK.WinUI"
+        xmlns:loc="using:Firefly.Localization"
         xmlns:local="using:Firefly"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Firefly"
@@ -59,7 +60,7 @@
                     Padding="0"
                     Command="{x:Bind PlayPauseCommand}"
                     Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                    ToolTipService.ToolTip="播放/暂停">
+                    ToolTipService.ToolTip="{x:Bind loc:Lang.PlayPause}">
                 <FontIcon x:Name="FontIcon_PlayPause"
                           FontSize="18"
                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -71,7 +72,7 @@
                     Padding="0"
                     Command="{x:Bind StartRandomMotionCommand}"
                     Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                    ToolTipService.ToolTip="随机表情">
+                    ToolTipService.ToolTip="{x:Bind loc:Lang.RandomEmotion}">
                 <FontIcon FontSize="18"
                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                           Glyph="&#xE76E;" />
@@ -105,15 +106,15 @@
                               FontSize="18"
                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                               Glyph="&#xE8A7;" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="新增 Live2D 窗口" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind loc:Lang.NewLive2DWindow}" />
                 </StackPanel>
             </Button>
 
             <TeachingTip x:Name="TeachingTip_NewLive2dWindow"
-                         Title="点击新增 Live2D 窗口"
-                         CloseButtonContent="不再显示"
+                         Title="{x:Bind loc:Lang.ClickToNewLive2DWindow}"
+                         CloseButtonContent="{x:Bind loc:Lang.DoNotShowAgain}"
                          Closed="TeachingTip_NewLive2dWindow_Closed"
-                         Subtitle="在 Live2D 窗口中点击鼠标右键打开菜单。"
+                         Subtitle="{x:Bind loc:Lang.RightClickInTheLive2DWindowToOpenTheMenu}"
                          Target="{x:Bind Button_NewLiev2dWindow}" />
 
             <Button Grid.Column="2"

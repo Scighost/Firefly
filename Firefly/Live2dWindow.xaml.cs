@@ -1,3 +1,4 @@
+using Firefly.Localization;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
@@ -177,7 +178,7 @@ public sealed partial class Live2dWindow : Window
             style |= User32.WindowStyles.WS_OVERLAPPEDWINDOW;
             styleEx &= ~(User32.WindowStylesEx.WS_EX_TOOLWINDOW);
             rt = new RECT(rt.X - l, rt.Y, rt.Right + l, rt.Bottom + l);
-            MenuFlyoutItem_BorderlessWindow.Text = "无边框 + 置顶";
+            MenuFlyoutItem_BorderlessWindow.Text = Lang.BorderlessAndAlwaysOnTop;
         }
         else
         {
@@ -186,7 +187,7 @@ public sealed partial class Live2dWindow : Window
             style &= ~User32.WindowStyles.WS_OVERLAPPEDWINDOW;
             styleEx |= (User32.WindowStylesEx.WS_EX_TOOLWINDOW);
             rt = new RECT(rt.X + l, rt.Y, rt.Right - l, rt.Bottom - l);
-            MenuFlyoutItem_BorderlessWindow.Text = "窗口模式";
+            MenuFlyoutItem_BorderlessWindow.Text = Lang.WindowMode;
         }
         User32.SetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_STYLE, (nint)style);
         User32.SetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_EXSTYLE, (nint)styleEx);

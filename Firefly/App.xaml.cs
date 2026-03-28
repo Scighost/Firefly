@@ -23,7 +23,7 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        _gcTimer = new(5_000);
+        _gcTimer = new(TimeSpan.FromSeconds(60));
         _gcTimer.Elapsed += (_, _) => GC.Collect();
         _gcTimer.Start();
     }

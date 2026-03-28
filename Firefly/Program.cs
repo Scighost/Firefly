@@ -16,7 +16,7 @@ public static partial class Program
     {
         if (Environment.OSVersion.Version < new Version("10.0.17763.0"))
         {
-            User32.MessageBox(HWND.NULL, "本程序需要 Windows 10 1809 (版本 17763) 或更高版本才能运行。", "Firefly");
+            User32.MessageBox(HWND.NULL, Firefly.Localization.Lang.SystemVersionTip, "Firefly");
             return;
         }
 

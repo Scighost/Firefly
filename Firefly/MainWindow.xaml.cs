@@ -306,7 +306,7 @@ public sealed partial class MainWindow : Window
     {
 #if !DEBUG
         _ = CheckUpdateAsync();
-        _checkUpdateTimer = new Timer(TimeSpan.FromMinutes(1).TotalMilliseconds);
+        _checkUpdateTimer = new Timer(TimeSpan.FromMinutes(60).TotalMilliseconds);
         _checkUpdateTimer.Elapsed += (_, _) => _ = CheckUpdateAsync();
         _checkUpdateTimer.Start();
 #endif

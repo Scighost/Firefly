@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:hn="using:H.NotifyIcon"
+        xmlns:loc="using:Firefly.Localization"
         xmlns:local="using:Firefly"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="TrayWindow"
@@ -31,7 +32,7 @@
                     <FontIcon HorizontalAlignment="Center"
                               FontSize="16"
                               Glyph="&#xE80F;" />
-                    <TextBlock VerticalAlignment="Center" Text="主页" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind loc:Lang.Home}" />
                 </StackPanel>
             </Button>
             <Button Height="36"
@@ -43,7 +44,7 @@
                     <FontIcon HorizontalAlignment="Center"
                               FontSize="16"
                               Glyph="&#xE7E8;" />
-                    <TextBlock VerticalAlignment="Center" Text="退出" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind loc:Lang.Exit}" />
                 </StackPanel>
             </Button>
 
