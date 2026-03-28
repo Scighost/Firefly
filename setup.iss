@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "Firefly"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.2.0"
 #define MyAppPublisher "Scighost"
 #define MyAppURL "https://firefly.scighost.com"
 #define MyAppExeName "Firefly.exe"

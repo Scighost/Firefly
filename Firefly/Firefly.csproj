@@ -13,7 +13,7 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<Nullable>enable</Nullable>
 		<CETCompat>false</CETCompat>
-		<Version>0.1.0</Version>
+		<Version>0.2.0</Version>
 		<ApplicationIcon>..\logo.ico</ApplicationIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
