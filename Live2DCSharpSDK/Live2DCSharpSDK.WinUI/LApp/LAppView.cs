@@ -25,6 +25,8 @@ public abstract class LAppView(LAppDelegate lapp)
     /// </summary>
     private readonly CubismViewMatrix _viewMatrix = new();
 
+    public bool Flip { get; set; }
+
     public abstract void RenderPre();
     public abstract void RenderPost();
 
@@ -74,6 +76,11 @@ public abstract class LAppView(LAppDelegate lapp)
             LAppDefine.ViewLogicalMaxBottom,
             LAppDefine.ViewLogicalMaxTop
         );
+
+        if (Flip)
+        {
+            _viewMatrix.Scale(-_viewMatrix.GetScaleX(), _viewMatrix.GetScaleY());
+        }
     }
 
 

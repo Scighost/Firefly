@@ -30,7 +30,14 @@
                                 Click="MenuFlyoutItem_Opacity_Click"
                                 Text="不透明度">
                     <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE711;" />
+                        <FontIcon Glyph="&#xE9E9;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem x:Name="MenuFlyoutItem_Flip"
+                                Click="MenuFlyoutItem_Flip_Click"
+                                Text="镜像翻转">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE8AB;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutItem x:Name="MenuFlyoutItem_CloseWindow"

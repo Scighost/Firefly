@@ -14,6 +14,9 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
     public LAppDelegateD3D11 LApp { get; private set; }
 
+    public bool ViewFlipped { get; private set; }
+
+
     private readonly System.Timers.Timer _timer;
 
     public Live2DSwapChainPanel() : base()
@@ -130,11 +133,23 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
 
 
+    public void FlipView()
+    {
+        ViewFlipped = !ViewFlipped;
+        LApp.View.Flip = ViewFlipped;
+        LApp.View.Initialize();
+    }
+
+
 
     public void MouseDragged(float x, float y)
     {
         if (_modelLoaded)
         {
+            if (ViewFlipped)
+            {
+                x = -x;
+            }
             LApp.Live2dManager.OnDrag(x, y);
         }
     }
@@ -174,6 +189,10 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
                 Point p = e.GetCurrentPoint(this).Position;
                 double x = p.X * 2 / this.ActualWidth - 1;
                 double y = 1 - p.Y * 2 / this.ActualHeight;
+                if (ViewFlipped)
+                {
+                    x = -x;
+                }
                 LApp.Live2dManager.OnTap((float)x, (float)y);
             }
             _pointerPressed = false;

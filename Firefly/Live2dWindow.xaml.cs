@@ -119,7 +119,8 @@ public sealed partial class Live2dWindow : Window
         float x = (pt.X - rt.X - rt.Width / 2f) / (rt.Width / 2f);
         float y = -(pt.Y - rt.Y - rt.Height / 2f) / (rt.Height / 2f);
 
-        if (Borderless && live2dPanel.LApp.Live2dManager.GetModelNum() > 0 && !live2dPanel.LApp.Live2dManager.HitAnyDrawable(x, y))
+        float fx = live2dPanel.ViewFlipped ? -x : x;
+        if (Borderless && live2dPanel.LApp.Live2dManager.GetModelNum() > 0 && !live2dPanel.LApp.Live2dManager.HitAnyDrawable(fx, y))
         {
             if (!_hitTransparent)
             {
@@ -213,6 +214,10 @@ public sealed partial class Live2dWindow : Window
         Close();
     }
 
+    private void MenuFlyoutItem_Flip_Click(object sender, RoutedEventArgs e)
+    {
+        live2dPanel.FlipView();
+    }
 }
 
 
