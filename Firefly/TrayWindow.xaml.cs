@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
 using Vanara.PInvoke;
 using Windows.Foundation;
 using WinRT.Interop;
@@ -109,7 +110,7 @@ public sealed partial class TrayWindow : Window
     [RelayCommand]
     private void ExitApp()
     {
-        App.Current.Exit();
+        Environment.Exit(0);
     }
 
 
