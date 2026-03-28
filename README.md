@@ -5,6 +5,7 @@
   把可爱的萤宝放在桌面上
 </p>
 
+[中文](./README.md) | [English](./README.en-US.md)
 
 # Firefly
 
