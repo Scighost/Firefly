@@ -62,7 +62,19 @@ public record ModelSettingObj
         public List<string> Ids { get; set; }
     }
 
+    public record ControllersSetting
+    {
+        public record MouseTrackingConfig
+        {
+            public float SmoothTime { get; set; } = 0.15f;
+            public bool Enabled { get; set; }
+        }
+
+        public MouseTrackingConfig? MouseTracking { get; set; }
+    }
+
     public FileReference FileReferences { get; set; }
+    public ControllersSetting? Controllers { get; set; }
     public List<HitArea> HitAreas { get; set; }
     public Dictionary<string, float> Layout { get; set; }
     public List<Parameter> Groups { get; set; }

@@ -149,6 +149,13 @@ public class LAppModel : CubismUserModel
         _modelSetting = JsonSerializer.Deserialize(stream, ModelSettingObjContext.Default.ModelSettingObj)
             ?? throw new Exception("model3.json error");
 
+        // 读取鼠标跟踪平滑时间
+        var smoothTime = _modelSetting.Controllers?.MouseTracking?.SmoothTime;
+        if (smoothTime > 0)
+        {
+            _dragManager.SmoothTime = smoothTime.Value;
+        }
+
         Updating = true;
         Initialized = false;
 
