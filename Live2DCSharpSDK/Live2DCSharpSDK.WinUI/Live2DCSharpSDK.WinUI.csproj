@@ -7,6 +7,7 @@
 		<UseWinUI>true</UseWinUI>
 		<WinUISDKReferences>false</WinUISDKReferences>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>

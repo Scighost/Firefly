@@ -8,7 +8,7 @@ using Windows.Foundation;
 
 namespace Live2DCSharpSDK.WinUI;
 
-public class Live2DSwapChainPanel : D3D11SwapChainPanel
+public partial class Live2DSwapChainPanel : D3D11SwapChainPanel
 {
 
 
@@ -47,7 +47,7 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
 
 
 
-    private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    private void _timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
         if (_modelLoaded)
         {
@@ -87,7 +87,7 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
         PointerMoved -= Live2DSwapChainPanel_PointerMoved;
         _modelLoaded = false;
         LApp.Dispose();
-        LApp = null;
+        LApp = null!;
         base.OnUnloaded(sender, e);
     }
 
@@ -115,7 +115,7 @@ public class Live2DSwapChainPanel : D3D11SwapChainPanel
     long lastTs;
 
 
-    protected override void OnRendering(object sender, object e)
+    protected override void OnRendering(object sender, object? e)
     {
         if (RenderPaused)
         {

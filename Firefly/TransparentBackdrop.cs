@@ -101,7 +101,7 @@ public partial class TransparentBackdrop : SystemBackdrop
             if (m_dispatcherQueueController == 0)
             {
                 DispatcherQueueOptions options;
-                options.dwSize = Marshal.SizeOf(typeof(DispatcherQueueOptions));
+                options.dwSize = Marshal.SizeOf<DispatcherQueueOptions>();
                 options.threadType = 2;    // DQTYPE_THREAD_CURRENT
                 options.apartmentType = 2; // DQTAT_COM_STA
 

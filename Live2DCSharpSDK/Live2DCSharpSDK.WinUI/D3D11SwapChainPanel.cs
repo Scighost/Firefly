@@ -68,7 +68,7 @@ public partial class D3D11SwapChainPanel : SwapChainPanel
 
 
 
-    protected virtual unsafe void OnRendering(object sender, object e)
+    protected virtual unsafe void OnRendering(object? sender, object e)
     {
         if (RenderPaused)
         {
