@@ -13,7 +13,7 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<Nullable>enable</Nullable>
 		<CETCompat>false</CETCompat>
-		<Version>0.2.1</Version>
+		<Version>0.2.2</Version>
 		<ApplicationIcon>..\logo.ico</ApplicationIcon>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
@@ -24,13 +24,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Manifest Include="$(ApplicationManifest)" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
-		<PackageReference Include="Vanara.PInvoke.ComCtl32" Version="5.0.1" />
-		<PackageReference Include="Vanara.PInvoke.DwmApi" Version="5.0.1" />
-		<Manifest Include="$(ApplicationManifest)" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.8249" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260529003" />
+		<PackageReference Include="Vanara.PInvoke.ComCtl32" Version="5.0.5" />
+		<PackageReference Include="Vanara.PInvoke.DwmApi" Version="5.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>

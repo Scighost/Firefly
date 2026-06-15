@@ -16,12 +16,12 @@ internal partial class WinAppRuntime
 
     private const double MB = 1 << 20;
 
-    private const string Url = "https://aka.ms/windowsappsdk/1.8/1.8.260317003/windowsappruntimeinstall-x64.exe";
+    private const string Url = "https://aka.ms/windowsappsdk/1.8/1.8.260529003/windowsappruntimeinstall-x64.exe";
 
 
     private const uint MajorMinorVersion = 0x00010008;
 
-    private const ulong MinVersion = 0x1F40032608CC0000;
+    private const ulong MinVersion = 0x1F40036F07E10000;
 
     internal static void AccessWindowsAppSDK()
     {
