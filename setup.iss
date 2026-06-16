@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "Firefly"
-#define MyAppVersion "0.2.2"
+#define MyAppVersion "0.3.0"
 #define MyAppPublisher "Scighost"
 #define MyAppURL "https://firefly.scighost.com"
 #define MyAppExeName "Firefly.exe"
@@ -48,7 +48,7 @@ Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.i
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "publish\*"; DestDir: "{app}"; Flags: recursesubdirs; Excludes: "*.pdb"
+Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Excludes: "*.pdb"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -60,4 +60,15 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [Registry]
 Root: HKCU; Subkey: "Software\Firefly"; Flags: uninsdeletekey
+
+[Code]
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  ResultCode: Integer;
+begin
+  Result := '';
+  NeedsRestart := False;
+  
+  Exec('taskkill', '/F /IM {#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+end;
 
