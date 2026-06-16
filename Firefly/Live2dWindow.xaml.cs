@@ -21,6 +21,22 @@ public sealed partial class Live2dWindow : Window
 
     public bool Borderless { get; set; }
 
+    internal string WindowId { get; set; } = "";
+
+    public bool ViewFlipped => live2dPanel.ViewFlipped;
+
+    public double PanelOpacity
+    {
+        get => live2dPanel.Opacity;
+        set => live2dPanel.Opacity = value;
+    }
+
+
+    public void FlipView()
+    {
+        live2dPanel.FlipView();
+    }
+
 
     private ComCtl32.SUBCLASSPROC SUBCLASSPROC;
 
@@ -33,6 +49,8 @@ public sealed partial class Live2dWindow : Window
         InitializeWindow();
         CreateTimer();
         this.Closed += Live2dWindow_Closed;
+        AppWindow.Changed += AppWindow_Changed;
+        live2dPanel.RegisterPropertyChangedCallback(UIElement.OpacityProperty, OnOpacityChanged);
         string file = Path.Combine(AppContext.BaseDirectory, "model", "FileReferences_Moc_0.model3.json");
         if (File.Exists(file))
         {
@@ -93,10 +111,26 @@ public sealed partial class Live2dWindow : Window
     {
         this.Closed -= Live2dWindow_Closed;
         this.SizeChanged -= MainWindow_SizeChanged;
+        AppWindow.Changed -= AppWindow_Changed;
         _timer.Tick -= DispatcherQueueTimer_Tick;
         _timer.Stop();
         _timer = null!;
         GridMenuFlyout.Items.Clear();
+    }
+
+
+    private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
+    {
+        if (args.DidPositionChange || args.DidSizeChange)
+        {
+            Live2dWindowState.SaveDebounced(DispatcherQueue, this);
+        }
+    }
+
+
+    private void OnOpacityChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        Live2dWindowState.SaveDebounced(DispatcherQueue, this);
     }
 
 
@@ -167,20 +201,17 @@ public sealed partial class Live2dWindow : Window
 
     private void MenuFlyoutItem_BorderlessWindow_Click(object sender, RoutedEventArgs e)
     {
+        ApplyBorderless(!Borderless);
+    }
+
+
+    public void ApplyBorderless(bool borderless)
+    {
         int l = (int)(8 * DpiScale);
         User32.GetWindowRect(WindowHandle, out var rt);
         User32.WindowStyles style = (User32.WindowStyles)User32.GetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_STYLE);
         User32.WindowStylesEx styleEx = (User32.WindowStylesEx)User32.GetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_EXSTYLE);
-        if (Borderless)
-        {
-            Borderless = false;
-            Border_DragArea.Visibility = Visibility.Visible;
-            style |= User32.WindowStyles.WS_OVERLAPPEDWINDOW;
-            styleEx &= ~(User32.WindowStylesEx.WS_EX_TOOLWINDOW);
-            rt = new RECT(rt.X - l, rt.Y, rt.Right + l, rt.Bottom + l);
-            MenuFlyoutItem_BorderlessWindow.Text = Lang.BorderlessAndAlwaysOnTop;
-        }
-        else
+        if (borderless)
         {
             Borderless = true;
             Border_DragArea.Visibility = Visibility.Collapsed;
@@ -188,6 +219,15 @@ public sealed partial class Live2dWindow : Window
             styleEx |= (User32.WindowStylesEx.WS_EX_TOOLWINDOW);
             rt = new RECT(rt.X + l, rt.Y, rt.Right - l, rt.Bottom - l);
             MenuFlyoutItem_BorderlessWindow.Text = Lang.WindowMode;
+        }
+        else
+        {
+            Borderless = false;
+            Border_DragArea.Visibility = Visibility.Visible;
+            style |= User32.WindowStyles.WS_OVERLAPPEDWINDOW;
+            styleEx &= ~(User32.WindowStylesEx.WS_EX_TOOLWINDOW);
+            rt = new RECT(rt.X - l, rt.Y, rt.Right + l, rt.Bottom + l);
+            MenuFlyoutItem_BorderlessWindow.Text = Lang.BorderlessAndAlwaysOnTop;
         }
         User32.SetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_STYLE, (nint)style);
         User32.SetWindowLong(WindowHandle, User32.WindowLongFlags.GWL_EXSTYLE, (nint)styleEx);
@@ -218,6 +258,7 @@ public sealed partial class Live2dWindow : Window
     private void MenuFlyoutItem_Flip_Click(object sender, RoutedEventArgs e)
     {
         live2dPanel.FlipView();
+        Live2dWindowState.SaveDebounced(DispatcherQueue, this);
     }
 }
 

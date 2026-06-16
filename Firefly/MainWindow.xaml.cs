@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -56,6 +57,7 @@ public sealed partial class MainWindow : Window
         AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
         AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         AppWindow.Closing += AppWindow_Closing;
+        Live2dWindows.CollectionChanged += Live2dWindows_CollectionChanged;
         Content.KeyDown += Content_KeyDown;
         AppWindow.TitleBar.SetDragRectangles([new RectInt32(0, 0, 100000, (int)(48 * UIScale))]);
         var flag = User32.GetWindowLongPtr(WindowHandle, User32.WindowLongFlags.GWL_STYLE);
@@ -143,11 +145,6 @@ public sealed partial class MainWindow : Window
 
 
 
-
-    //public List<string> Motions { get; set => SetProperty(ref field, value); }
-
-
-
     private async void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         await Task.Delay(100);
@@ -162,20 +159,6 @@ public sealed partial class MainWindow : Window
             if (File.Exists(file))
             {
                 live2dPanel.LoadModel(Path.Combine(AppContext.BaseDirectory, "model"), "FileReferences_Moc_0");
-                //using var fs = File.OpenRead(file);
-                //ModelSettingObj? obj = await JsonSerializer.DeserializeAsync(fs, ModelSettingObjContext.Default.ModelSettingObj);
-                //if (obj is not null)
-                //{
-                //    var list = new List<string>();
-                //    foreach (var dict in obj.FileReferences.Motions)
-                //    {
-                //        foreach (var item in dict.Value)
-                //        {
-                //            list.Add($"{dict.Key}:{item.Name}");
-                //        }
-                //    }
-                //    Motions = list;
-                //}
             }
         }
         catch (Exception ex)
@@ -338,7 +321,39 @@ public sealed partial class MainWindow : Window
         try
         {
             var window = new Live2dWindow();
-            var info = new Live2DWindowInfo((++windowNameIndex).ToString(), window);
+            string id = Guid.NewGuid().ToString();
+            var info = new Live2DWindowInfo(id, (++windowNameIndex).ToString(), window);
+            info.Closed += Live2DWindowInfo_Closed;
+            Live2dWindows.Add(info);
+            window.Activate();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
+    }
+
+
+    internal void RestoreLive2dWindow(Live2dWindowState state)
+    {
+        try
+        {
+            var window = new Live2dWindow();
+            windowNameIndex++;
+            window.AppWindow.MoveAndResize(new RectInt32(state.X, state.Y, state.Width, state.Height));
+            if (state.Borderless)
+            {
+                window.ApplyBorderless(true);
+            }
+            if (state.Flipped)
+            {
+                window.FlipView();
+            }
+            if (state.Opacity < 1.0)
+            {
+                window.PanelOpacity = state.Opacity;
+            }
+            var info = new Live2DWindowInfo(state.Id, windowNameIndex.ToString(), window);
             info.Closed += Live2DWindowInfo_Closed;
             Live2dWindows.Add(info);
             window.Activate();
@@ -355,8 +370,15 @@ public sealed partial class MainWindow : Window
         if (sender is Live2DWindowInfo info)
         {
             info.Closed -= Live2DWindowInfo_Closed;
+            Live2dWindowState.DeleteById(info.Id);
             Live2dWindows.Remove(info);
         }
+    }
+
+
+    private void Live2dWindows_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Live2dWindowState.SaveAll(Live2dWindows);
     }
 
 

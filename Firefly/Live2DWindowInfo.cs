@@ -9,6 +9,8 @@ namespace Firefly;
 public partial class Live2DWindowInfo : ObservableObject
 {
 
+    public string Id { get; }
+
     public string Name { get; set; }
 
 
@@ -23,10 +25,12 @@ public partial class Live2DWindowInfo : ObservableObject
 
 
 
-    public Live2DWindowInfo(string name, Live2dWindow window)
+    public Live2DWindowInfo(string id, string name, Live2dWindow window)
     {
+        Id = id;
         Name = name;
         Window = window;
+        Window.WindowId = id;
         Window.AppWindow.Changed += AppWindow_Changed;
         Window.AppWindow.Destroying += AppWindow_Destroying;
     }
@@ -46,6 +50,7 @@ public partial class Live2DWindowInfo : ObservableObject
     {
         sender.Changed -= AppWindow_Changed;
         sender.Destroying -= AppWindow_Destroying;
+        Live2dWindowState.CancelPendingSave();
         Closed?.Invoke(this, args);
     }
 
