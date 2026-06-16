@@ -159,6 +159,9 @@
   <data name="RandomEmotion" xml:space="preserve">
     <value>Random emotion</value>
   </data>
+  <data name="ShowHitArea" xml:space="preserve">
+    <value>Show / Hide hit area</value>
+  </data>
   <data name="Opacity" xml:space="preserve">
     <value>Opacity</value>
   </data>

@@ -811,6 +811,46 @@ public class LAppModel : CubismUserModel
     }
 
     /// <summary>
+    /// 获取所有 HitArea 对应的 ArtMesh 的模型坐标包围盒。
+    /// </summary>
+    /// <returns>包含名称和模型坐标矩形的列表</returns>
+    public unsafe List<(string name, float left, float right, float top, float bottom)> GetHitAreaModelBounds()
+    {
+        var result = new List<(string name, float left, float right, float top, float bottom)>();
+        if (_modelSetting.HitAreas == null || Model == null) return result;
+
+        foreach (var area in _modelSetting.HitAreas)
+        {
+            var drawIndex = Model.GetDrawableIndex(area.Id);
+            if (drawIndex < 0) continue;
+
+            var count = Model.GetDrawableVertexCount(drawIndex);
+            var vertices = Model.GetDrawableVertices(drawIndex);
+            if (count == 0 || vertices == null) continue;
+
+            var left = vertices[0];
+            var right = vertices[0];
+            var top = vertices[1];
+            var bottom = vertices[1];
+
+            for (int j = 1; j < count; ++j)
+            {
+                var x = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep];
+                var y = vertices[CubismFramework.VertexOffset + j * CubismFramework.VertexStep + 1];
+
+                if (x < left) left = x;
+                if (x > right) right = x;
+                if (y < top) top = y;
+                if (y > bottom) bottom = y;
+            }
+
+            result.Add((area.Name, left, right, top, bottom));
+        }
+
+        return result;
+    }
+
+    /// <summary>
 
     /// 检查动作的 VarFloats 条件（Type=1）是否全部满足。
     /// 所有条件均通过时返回 true，任意一条失败则返回 false。

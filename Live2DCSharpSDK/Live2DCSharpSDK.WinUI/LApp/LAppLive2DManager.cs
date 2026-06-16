@@ -123,6 +123,13 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
 
     private readonly CubismMatrix44 _projection = new();
 
+    private readonly CubismMatrix44 _projectionViewMatrix = new();
+
+    /// <summary>
+    /// 最近一帧的 Projection * ViewMatrix 组合矩阵，用于坐标转换。
+    /// </summary>
+    public CubismMatrix44 ProjectionViewMatrix => _projectionViewMatrix;
+
     /// <summary>
     /// 更新画面时的处理，执行模型更新和绘制处理
     /// </summary>
@@ -157,6 +164,8 @@ public class LAppLive2DManager(LAppDelegate lapp) : IDisposable
             {
                 _projection.MultiplyByMatrix(ViewMatrix);
             }
+
+            _projectionViewMatrix.SetMatrix(_projection);
 
             model.Update();
             model.Draw(_projection); // 传引用，projection 会被修改

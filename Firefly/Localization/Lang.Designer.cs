@@ -259,6 +259,15 @@ namespace Firefly.Localization {
         }
         
         /// <summary>
+        ///   查找类似 Show / Hide hit area 的本地化字符串。
+        /// </summary>
+        internal static string ShowHitArea {
+            get {
+                return ResourceManager.GetString("ShowHitArea", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 This program requires Windows 10 version 1809 (build 17763) or later to run. 的本地化字符串。
         /// </summary>
         internal static string SystemVersionTip {

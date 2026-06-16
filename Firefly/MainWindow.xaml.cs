@@ -5,6 +5,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -224,6 +225,89 @@ public sealed partial class MainWindow : Window
             if (live2dPanel.LApp.Live2dManager.GetModelNum() > 0)
             {
                 live2dPanel.LApp.Live2dManager.GetModel(0).StartMotion("表情组", Random.Shared.Next(3, 11));
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
+    }
+
+
+    private bool _showHitArea;
+    private DispatcherTimer? _hitAreaTimer;
+
+    [RelayCommand]
+    private void ToggleHitArea()
+    {
+        if (_hitAreaTimer is null)
+        {
+            _hitAreaTimer = new DispatcherTimer();
+            _hitAreaTimer.Interval = TimeSpan.FromMilliseconds(16);
+            _hitAreaTimer.Tick += UpdateHitAreas;
+        }
+        _showHitArea = !_showHitArea;
+        if (_showHitArea)
+        {
+            _hitAreaTimer.Start();
+        }
+        else
+        {
+            _hitAreaTimer?.Stop();
+            HitAreaCanvas.Children.Clear();
+        }
+    }
+
+    private void UpdateHitAreas(object? sender, object e)
+    {
+        try
+        {
+            HitAreaCanvas.Children.Clear();
+            if (!_showHitArea || live2dPanel.LApp.Live2dManager.GetModelNum() == 0) return;
+
+            var model = live2dPanel.LApp.Live2dManager.GetModel(0);
+            var hitAreas = model.GetHitAreaModelBounds();
+            var modelMatrix = model.ModelMatrix;
+            var projView = live2dPanel.LApp.Live2dManager.ProjectionViewMatrix;
+            double panelWidth = live2dPanel.ActualWidth;
+            double panelHeight = live2dPanel.ActualHeight;
+
+            foreach (var (name, modelLeft, modelRight, modelTop, modelBottom) in hitAreas)
+            {
+                // Model坐标 → ModelMatrix → 投影坐标 → ProjectionViewMatrix → NDC → 屏幕
+                float ndcLeft = projView.TransformX(modelMatrix.TransformX(modelLeft));
+                float ndcRight = projView.TransformX(modelMatrix.TransformX(modelRight));
+                float ndcTop = projView.TransformY(modelMatrix.TransformY(modelTop));
+                float ndcBottom = projView.TransformY(modelMatrix.TransformY(modelBottom));
+
+                float screenLeft = (ndcLeft + 1) * (float)panelWidth / 2;
+                float screenRight = (ndcRight + 1) * (float)panelWidth / 2;
+                float screenTop = (1 - ndcTop) * (float)panelHeight / 2;
+                float screenBottom = (1 - ndcBottom) * (float)panelHeight / 2;
+
+                var rect = new Microsoft.UI.Xaml.Shapes.Rectangle
+                {
+                    Width = Math.Abs(screenRight - screenLeft),
+                    Height = Math.Abs(screenBottom - screenTop),
+                    Stroke = new SolidColorBrush(Colors.Red),
+                    StrokeThickness = 2,
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(rect, Math.Min(screenLeft, screenRight));
+                Canvas.SetTop(rect, Math.Min(screenTop, screenBottom));
+                HitAreaCanvas.Children.Add(rect);
+
+                var label = new TextBlock
+                {
+                    Text = name,
+                    Foreground = new SolidColorBrush(Colors.Red),
+                    FontSize = 12,
+                    IsHitTestVisible = false
+                };
+                Canvas.SetLeft(label, Math.Min(screenLeft, screenRight));
+                Canvas.SetTop(label, Math.Min(screenTop, screenBottom) - 16);
+                HitAreaCanvas.Children.Add(label);
             }
         }
         catch (Exception ex)

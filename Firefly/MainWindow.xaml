@@ -28,6 +28,10 @@
 
         <l2d:Live2DSwapChainPanel x:Name="live2dPanel" Grid.RowSpan="2" />
 
+        <Canvas x:Name="HitAreaCanvas"
+                Grid.RowSpan="2"
+                IsHitTestVisible="False" />
+
 
         <StackPanel Margin="16,0,0,0"
                     Orientation="Horizontal"
@@ -76,6 +80,17 @@
                 <FontIcon FontSize="18"
                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                           Glyph="&#xE76E;" />
+            </Button>
+            <Button x:Name="Button_HitArea"
+                    Width="28"
+                    Height="28"
+                    Padding="0"
+                    Command="{x:Bind ToggleHitAreaCommand}"
+                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
+                    ToolTipService.ToolTip="{x:Bind loc:Lang.ShowHitArea}">
+                <FontIcon FontSize="18"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          Glyph="&#xE7C1;" />
             </Button>
         </StackPanel>
 
