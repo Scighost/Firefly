@@ -1,0 +1,8 @@
+node_modules/
+dist/
+public/model/
+*.local
+.DS_Store
+*.tsbuildinfo
+src/**/*.js
+src/**/*.js.map

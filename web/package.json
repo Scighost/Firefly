@@ -1,0 +1,21 @@
+{
+  "name": "firefly-web",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "xcopy /E /I /Y \"..\\model\" \"public\\model\" && vite",
+    "build": "vite build && xcopy /E /I /Y \"..\\model\" \"dist\\model\"",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vue-tsc": "^2.2.8"
+  }
+}
